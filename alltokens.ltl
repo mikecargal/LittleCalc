@@ -1,0 +1,31 @@
+if
+else
+=
+==
+==
+<
+<=
+>
+>=
+true
+false
+print
+(
+)
+{
+}
+^
+*
+/
++
+-
+0
+10000
+10_000_000
+0.89
+10.99
+"A String (\''\")"
+'Another String(\""\')'
+identifier
+$
+

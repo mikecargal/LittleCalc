@@ -1,0 +1,14 @@
+q = 3.14
+print "q=" q
+x = 8
+y = x^2
+ a = x+7
+  *y
+ print a 
+  + 7
+b = x < 7 ? 42 : 84
+print "b=" b
+print a < 5 ? "a < 5" : "a >= 5"
+print "y=" y
+print (y / 8) * 4^2
+// print 50+50-25*0+2+2
