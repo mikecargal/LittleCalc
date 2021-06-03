@@ -1,9 +1,15 @@
 grammar LittleCalc
     ;
 
+replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
+
 stmts: stmt* EOF;
-stmt:  ID '=' expr # AssignmentStmt 
-    | PRINT expr* # PrintStmt;
+stmt
+    : ID '=' expr # AssignmentStmt
+    | PRINT expr* # PrintStmt
+    | VARS        # printVars
+    | STACK       # printStack
+    ;
 expr
     : '(' expr ')'                                             # ParenExpr
     | <assoc = right> base = expr '^' exp = expr               # ExpExpr
@@ -32,6 +38,8 @@ GE:     '>=';
 TRUE:  'true';
 FALSE: 'false';
 PRINT: 'print';
+VARS:  'vars';
+STACK: 'stack';
 
 // Symbol Tokens
 O_PAREN: '(';
@@ -53,6 +61,6 @@ STRING:         '"' ('\\"' | '\\\'' | .)*? '"';
 S_STRING:       '\'' ('\\"' | '\\\'' | .)*? '\'' -> type(STRING);
 ID:             (ALPHA | '_') (ALPHA | DIGIT | '_')*;
 COMMENT:        '//' .*? ('\n' | EOF) -> skip;
-WS:             [ \t\r\n]+    -> skip;
-//LINE_CONT:      '\\\n' -> skip;
+WS:             [ \t\r\n]+            -> skip;
+//LINE_CONT:      '\\\n'                -> skip;
 BAD_TOKEN: .;

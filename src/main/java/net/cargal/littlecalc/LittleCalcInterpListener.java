@@ -22,8 +22,6 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var val = stack.pop();
         variables.put(ctx.ID().getText(), val);
         Logger.debug("assignment to " + ctx.ID().getText());
-        dumpStack();
-        dumpVariables();
     }
 
     @Override
@@ -40,11 +38,21 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     }
 
     @Override
+    public void exitPrintVars(LittleCalcParser.PrintVarsContext ctx) {
+        dumpVariables();
+    }
+
+    @Override
+    public void exitPrintStack(LittleCalcParser.PrintStackContext ctx) {
+        dumpStack();
+    }
+
+    @Override
     public void exitIDExpr(LittleCalcParser.IDExprContext ctx) {
         LittleValue idVal = variables.get(ctx.ID().getText());
         assertion(idVal != null, ctx.ID().getText() + " has not been assigned a value", ctx);
         stack.push(idVal);
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
@@ -53,7 +61,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var lhs = stack.pop().number();
         var res = ctx.op.getType() == LittleCalcLexer.MUL ? lhs * rhs : lhs / rhs;
         stack.push(LittleValue.numberValue(res, ctx));
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
@@ -61,7 +69,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var rhs = stack.pop();
         var lhs = stack.pop();
         stack.push(LittleValue.boolValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
@@ -69,7 +77,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var base = stack.pop().number();
         var exp = stack.pop().number();
         stack.push(LittleValue.numberValue(Math.pow(base, exp), ctx));
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
@@ -78,7 +86,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var lhs = stack.pop().number();
         var res = ctx.op.getType() == LittleCalcLexer.ADD ? lhs + rhs : lhs - rhs;
         stack.push(LittleValue.numberValue(res, ctx));
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
@@ -90,31 +98,31 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         stack.push(res);
         // throw new LittleCalcRuntimeException("why not", 1, 1);
         dumpStack();
-        debugExpr(ctx);
+       // debugExpr(ctx);
     }
 
     @Override
     public void exitNumberExpr(LittleCalcParser.NumberExprContext ctx) {
         stack.push(LittleValue.numberValue(doubleFromToken(ctx.NUMBER()), ctx));
-        debugExpr(ctx);
+      //  debugExpr(ctx);
     }
 
     @Override
     public void exitTrueExpr(LittleCalcParser.TrueExprContext ctx) {
         stack.push(LittleValue.boolValue(true, ctx));
-        debugExpr(ctx);
+      //  debugExpr(ctx);
     }
 
     @Override
     public void exitFalseExpr(LittleCalcParser.FalseExprContext ctx) {
         stack.push(LittleValue.boolValue(false, ctx));
-        debugExpr(ctx);
+      //  debugExpr(ctx);
     }
 
     @Override
     public void exitStringExpr(LittleCalcParser.StringExprContext ctx) {
         stack.push(LittleValue.stringValue(stringFromToken(ctx.STRING()), ctx));
-        debugExpr(ctx);
+    //    debugExpr(ctx);
     }
 
     private Double doubleFromToken(TerminalNode token) {
@@ -129,21 +137,21 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     }
 
     public void dumpVariables() {
-        Logger.debug("Variables:");
+        //Logger.debug("Variables:");
         for (Entry<String, LittleValue> entry : variables.entrySet()) {
-            Logger.debug("\t" + entry.getKey() + " : " + entry.getValue());
+            System.out.println("\t" + entry.getKey() + " : " + entry.getValue());
         }
     }
 
-    private void debugExpr(LittleCalcParser.ExprContext expr) {
-        Logger.debug(expr.getText());
-        dumpStack();
-    }
+    // private void debugExpr(LittleCalcParser.ExprContext expr) {
+    //     //Logger.debug(expr.getText());
+    //     dumpStack();
+    // }
 
     private void dumpStack() {
-        Logger.debug("---- Stack ----");
-        stack.stream().forEach(Logger::debug);
-        Logger.debug("-----------------");
+       // Logger.debug("---- Stack ----");
+        stack.stream().forEach(System.out::println);
+       // Logger.debug("-----------------");
     }
 
     private void assertion(boolean condition, String message, ParserRuleContext ctx) {

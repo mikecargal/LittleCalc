@@ -47,5 +47,10 @@ task(interp, dependsOn: 'classes', type: JavaExec) {
     main = 'net.cargal.littlecalc.LittleCalcInterp'
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in 
-    enableAssertions = true
+}
+
+task(repl, dependsOn: 'classes', type: JavaExec) {
+    main = 'net.cargal.littlecalc.LittleCalcRepl'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
 }
