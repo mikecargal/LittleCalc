@@ -2,14 +2,13 @@ package net.cargal.littlecalc;
 
 import java.util.Scanner;
 
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 public class LittleCalcRepl {
     public static void main(String... args) {
         var keyboard = new Scanner(System.in);
-        CharStream charStream = CharStreams.fromString("");
+        var charStream = CharStreams.fromString("");
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);

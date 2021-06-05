@@ -83,8 +83,8 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     @Override
     public void exitExpExpr(LittleCalcParser.ExpExprContext ctx) {
         guarded(ctx, () -> {
-            var base = stack.pop().number();
             var exp = stack.pop().number();
+            var base = stack.pop().number();
             stack.push(LittleValue.numberValue(Math.pow(base, exp), ctx));
         });
     }
