@@ -8,7 +8,6 @@ stmt
     : ID '=' expr # AssignmentStmt
     | PRINT expr* # PrintStmt
     | VARS        # printVars
-    | STACK       # printStack
     ;
 expr
     : '(' expr ')'                                             # ParenExpr
@@ -62,5 +61,4 @@ S_STRING:       '\'' ('\\"' | '\\\'' | .)*? '\'' -> type(STRING);
 ID:             (ALPHA | '_') (ALPHA | DIGIT | '_')*;
 COMMENT:        '//' .*? ('\n' | EOF) -> skip;
 WS:             [ \t\r\n]+            -> skip;
-//LINE_CONT:      '\\\n'                -> skip;
 BAD_TOKEN: .;
