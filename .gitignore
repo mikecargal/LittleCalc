@@ -1,5 +1,4 @@
 .antlr
-little/src/gen
 .history
 .DS_Store
 # Ignore Gradle project-specific cache directory
