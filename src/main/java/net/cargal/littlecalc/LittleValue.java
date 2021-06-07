@@ -17,14 +17,14 @@ public class LittleValue implements Comparable<LittleValue> {
         NUMBER, STRING, BOOLEAN
     }
 
-    private static final Map<ValueType, Set<Integer>> compareTypeMap;
+    private static final Map<ValueType, Set<Integer>> validCompareTypesMap;
     static {
-        compareTypeMap = new EnumMap<>(ValueType.class);
-        compareTypeMap.put(ValueType.BOOLEAN, //
+        validCompareTypesMap = new EnumMap<>(ValueType.class);
+        validCompareTypesMap.put(ValueType.BOOLEAN, //
                 new HashSet<>(Arrays.asList( //
                         LittleCalcLexer.EQ, //
                         LittleCalcLexer.NE)));
-        compareTypeMap.put(ValueType.STRING, //
+        validCompareTypesMap.put(ValueType.STRING, //
                 new HashSet<>(Arrays.asList( //
                         LittleCalcLexer.EQ, //
                         LittleCalcLexer.NE, //
@@ -32,7 +32,7 @@ public class LittleValue implements Comparable<LittleValue> {
                         LittleCalcLexer.LE, //
                         LittleCalcLexer.GT, //
                         LittleCalcLexer.GE)));
-        compareTypeMap.put(ValueType.NUMBER, //
+        validCompareTypesMap.put(ValueType.NUMBER, //
                 new HashSet<>(Arrays.asList( //
                         LittleCalcLexer.EQ, //
                         LittleCalcLexer.NE, //
@@ -46,6 +46,14 @@ public class LittleValue implements Comparable<LittleValue> {
     private Object value;
     private int line;
     private int column;
+ 
+    public int getLine() {
+        return line;
+    }
+
+     public int getColumn() {
+        return column;
+    }
 
     private LittleValue(ValueType vType, Object value, ParserRuleContext ctx) {
         this.vType = vType;
@@ -64,7 +72,7 @@ public class LittleValue implements Comparable<LittleValue> {
 
     }
 
-    static LittleValue boolValue(boolean bv, ParserRuleContext ctx) {
+    static LittleValue booleanValue(boolean bv, ParserRuleContext ctx) {
         return new LittleValue(ValueType.BOOLEAN, Boolean.valueOf(bv), ctx);
     }
 
@@ -128,7 +136,7 @@ public class LittleValue implements Comparable<LittleValue> {
     }
 
     private boolean validCompareForType(int compareOp) {
-        return compareTypeMap.get(type()).contains(compareOp);
+        return validCompareTypesMap.get(type()).contains(compareOp);
     }
 
     private void assertion(boolean condition, String message) {

@@ -76,7 +76,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         guarded(ctx, () -> {
             var rhs = stack.pop();
             var lhs = stack.pop();
-            stack.push(LittleValue.boolValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
+            stack.push(LittleValue.booleanValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
         });
     }
 
@@ -120,14 +120,14 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     @Override
     public void exitTrueExpr(LittleCalcParser.TrueExprContext ctx) {
         guarded(ctx, () -> {
-            stack.push(LittleValue.boolValue(true, ctx));
+            stack.push(LittleValue.booleanValue(true, ctx));
         });
     }
 
     @Override
     public void exitFalseExpr(LittleCalcParser.FalseExprContext ctx) {
         guarded(ctx, () -> {
-            stack.push(LittleValue.boolValue(false, ctx));
+            stack.push(LittleValue.booleanValue(false, ctx));
         });
     }
 
