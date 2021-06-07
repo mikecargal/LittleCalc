@@ -27,6 +27,8 @@ public class LittleValueTest {
         var lv = LittleValue.stringValue(testString, mockContext);
         assertEquals(LittleValue.ValueType.STRING, lv.type());
         assertTrue(lv.isString());
+        assertFalse(lv.isNumber());
+        assertFalse(lv.isBoolean());
         assertEquals(testString, lv.string());
         assertEquals(LINE, lv.getLine());
         assertEquals(COLUMN, lv.getColumn());
@@ -38,6 +40,8 @@ public class LittleValueTest {
         var lv = LittleValue.numberValue(testValue, mockContext);
         assertEquals(LittleValue.ValueType.NUMBER, lv.type());
         assertTrue(lv.isNumber());
+        assertFalse(lv.isString());
+        assertFalse(lv.isBoolean());
         assertEquals(testValue, lv.number());
         assertEquals(LINE, lv.getLine());
         assertEquals(COLUMN, lv.getColumn());
@@ -49,6 +53,8 @@ public class LittleValueTest {
         var lv = LittleValue.booleanValue(testBool, mockContext);
         assertEquals(LittleValue.ValueType.BOOLEAN, lv.type());
         assertTrue(lv.isBoolean());
+        assertFalse(lv.isString());
+        assertFalse(lv.isNumber());
         assertEquals(testBool, lv.bool());
         assertEquals(LINE, lv.getLine());
         assertEquals(COLUMN, lv.getColumn());
@@ -57,6 +63,8 @@ public class LittleValueTest {
         lv = LittleValue.booleanValue(testBool, mockContext);
         assertEquals(LittleValue.ValueType.BOOLEAN, lv.type());
         assertTrue(lv.isBoolean());
+        assertFalse(lv.isString());
+        assertFalse(lv.isNumber());
         assertEquals(testBool, lv.bool());
         assertEquals(LINE, lv.getLine());
         assertEquals(COLUMN, lv.getColumn());
