@@ -46,12 +46,12 @@ public class LittleValue implements Comparable<LittleValue> {
     private Object value;
     private int line;
     private int column;
- 
+
     public int getLine() {
         return line;
     }
 
-     public int getColumn() {
+    public int getColumn() {
         return column;
     }
 
@@ -112,11 +112,9 @@ public class LittleValue implements Comparable<LittleValue> {
     }
 
     public boolean evalCompare(int compareOp, LittleValue rhs) {
-        Logger.debug("comparing " + number() + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + rhs.number() + "="
-                + (number() < rhs.number()));
         assertion(type() == rhs.type(), "Cannot compare " + type() + " to " + rhs.type());
-        assertion(validCompareForType(compareOp),
-                LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + " is not valid for " + type() + " values");
+        assertion(validCompareForType(compareOp), "Comparison operator ("
+                + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + ") is not valid for " + type() + " values");
         switch (compareOp) {
             case LittleCalcLexer.LT:
                 return compareTo(rhs) < 0;
@@ -164,6 +162,8 @@ public class LittleValue implements Comparable<LittleValue> {
         if (!(o instanceof LittleValue))
             return false;
         LittleValue olv = (LittleValue) o;
+        if (!type().equals(olv.type()))
+            return false;
         switch (type()) {
             case BOOLEAN:
                 return bool() == olv.bool();

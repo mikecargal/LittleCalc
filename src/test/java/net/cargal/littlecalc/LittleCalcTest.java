@@ -3,12 +3,13 @@
  */
 package net.cargal.littlecalc;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class LittleCalcTest {
     @Test public void testAppHasAGreeting() {
         var classUnderTest = new LittleCalc();
-        
+        assertEquals(classUnderTest.getClass(),LittleCalc.class);
     }
 }
