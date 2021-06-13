@@ -32,6 +32,7 @@ public class LittleValueTest {
         assertEquals(testString, lv.string());
         assertEquals(LINE, lv.getLine());
         assertEquals(COLUMN, lv.getColumn());
+        assertEquals(testString,lv.toString());
     }
 
     @Test
