@@ -11,7 +11,7 @@ public class LittleReplErrorListener extends ConsoleErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
             String msg, RecognitionException e) {
-        if (e.getOffendingToken().getType() == Recognizer.EOF) {
+        if (e != null && e.getOffendingToken().getType() == Recognizer.EOF) {
             errorAtEOF = true;
         } else {
             hasSyntaxError = true;
