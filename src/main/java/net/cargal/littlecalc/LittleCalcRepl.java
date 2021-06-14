@@ -1,13 +1,25 @@
 package net.cargal.littlecalc;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 public class LittleCalcRepl {
-    public static void main(String... args) {
+    private static final String INITIAL_PROMPT = "> ";
+    private static final String CONTINUE_PROMPT = "| ";
+
+    public static void main(String... args) throws IOException {
+        var prompt = INITIAL_PROMPT;
+        Terminal terminal = TerminalBuilder.terminal();
+        LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+
         var keyboard = new Scanner(System.in);
         var charStream = CharStreams.fromString("");
         var lexer = new LittleCalcLexer(charStream);
@@ -19,13 +31,12 @@ public class LittleCalcRepl {
         parser.addErrorListener(replErrListener);
         var input = "";
         while (true) {
-            System.out.print("\n> ");
-            input += keyboard.nextLine();
+            input += lineReader.readLine(prompt);
             if (input.equals("quit")) {
                 break;
             }
-            if (input.endsWith("\\")) {
-                input = input.substring(0, input.length() - 1);
+            if (lineReader.getParsedLine().line().trim().endsWith("\\")) {
+                prompt = CONTINUE_PROMPT;
             } else {
                 charStream = CharStreams.fromString(input);
                 lexer.setInputStream(charStream);
@@ -35,8 +46,11 @@ public class LittleCalcRepl {
                 if (replErrListener.canProcessReplInput()) {
                     ParseTreeWalker.DEFAULT.walk(listener, replTree);
                 }
-                if (!replErrListener.incompleteInput()) {
+                if (replErrListener.incompleteInput()) {
+                    prompt = CONTINUE_PROMPT;
+                } else {
                     input = "";
+                    prompt = INITIAL_PROMPT;
                 }
                 replErrListener.reset();
                 listener.reset();
