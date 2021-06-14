@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class LittleCalcRepl {
     public static void main(String... args) {
@@ -13,7 +14,9 @@ public class LittleCalcRepl {
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);
         var listener = new LittleCalcInterpListener();
-        parser.addParseListener(listener);
+        parser.removeErrorListeners();
+        var replErrListener = new LittleReplErrorListener();
+        parser.addErrorListener(replErrListener);
         var input = "";
         while (true) {
             System.out.print("\n> ");
@@ -28,8 +31,15 @@ public class LittleCalcRepl {
                 lexer.setInputStream(charStream);
                 tokenStream.setTokenSource(lexer);
                 parser.setTokenStream(tokenStream);
-                parser.replIn();
-                input = "";
+                var replTree = parser.replIn();
+                if (replErrListener.canProcessReplInput()) {
+                    ParseTreeWalker.DEFAULT.walk(listener, replTree);
+                }
+                if (!replErrListener.incompleteInput()) {
+                    input = "";
+                }
+                replErrListener.reset();
+                listener.reset();
             }
         }
         System.out.println("Exiting...");

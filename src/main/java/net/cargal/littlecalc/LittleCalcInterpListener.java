@@ -17,6 +17,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     private Map<String, LittleValue> variables = new HashMap<>();
     private Deque<LittleValue> stack = new ArrayDeque<>();
     private ParserRuleContext previousCtx = null;
+    private boolean encounteredError = false;
 
     @Override
     public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
@@ -155,13 +156,19 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         }
     }
 
+    public void reset() {
+        encounteredError = false;
+    }
+
     private void guarded(ParserRuleContext ctx, Runnable runnable) {
         if (ctx != previousCtx) {
             previousCtx = ctx;
-            try {
-                runnable.run();
-            } catch (LittleCalcRuntimeException lcre) {
-                System.out.println(lcre.getMessage());
+            if (!encounteredError) {
+                try {
+                    runnable.run();
+                } catch (LittleCalcRuntimeException lcre) {
+                    System.out.println(lcre.getMessage());
+                }
             }
         }
     }
@@ -169,6 +176,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     private void assertion(boolean condition, String message, ParserRuleContext ctx) {
         if (!condition) {
             Token tk = ctx.getStart();
+            encounteredError = true;
             throw new LittleCalcRuntimeException(message, tk.getLine(), tk.getCharPositionInLine());
         }
     }
