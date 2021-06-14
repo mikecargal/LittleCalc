@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.tinylog.Logger;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 

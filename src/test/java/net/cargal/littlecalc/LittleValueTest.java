@@ -1,15 +1,17 @@
 package net.cargal.littlecalc;
 
-import jdk.jfr.Timestamp;
-import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.annotation.Testable;
+
+import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LittleValueTest {
     private final int LINE = 5;
