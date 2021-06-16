@@ -1,22 +1,31 @@
 package net.cargal.littlecalc;
 
-import org.antlr.v4.runtime.ConsoleErrorListener;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
-public class LittleReplErrorListener extends ConsoleErrorListener {
+public class LittleReplErrorListener extends BaseErrorListener {
     private boolean errorAtEOF = false;
     private boolean hasSyntaxError = false;
 
     @Override
-    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
-            String msg, RecognitionException e) {
+    public void syntaxError( //
+            Recognizer<?, ?> recognizer, //
+            Object offendingSymbol, //
+            int line, //
+            int charPositionInLine, //
+            String msg, //
+            RecognitionException e) {
         if (e != null && e.getOffendingToken().getType() == Recognizer.EOF) {
             errorAtEOF = true;
         } else {
             hasSyntaxError = true;
-            super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+            reportError("line " + line + ":" + charPositionInLine + " " + msg);
         }
+    }
+
+    protected void reportError(String str) {
+        System.err.println(str);
     }
 
     public void reset() {
@@ -31,4 +40,5 @@ public class LittleReplErrorListener extends ConsoleErrorListener {
     public boolean canProcessReplInput() {
         return !hasSyntaxError && !errorAtEOF;
     }
+
 }

@@ -19,9 +19,21 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
     private ParserRuleContext previousCtx = null;
     private boolean encounteredError = false;
 
+    protected void print(Object o) {
+        System.out.print(o);
+    }
+
+    protected void println(Object o) {
+        System.out.println(o);
+    }
+
+    protected void println() {
+        System.out.println();
+    }
+
     @Override
     public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
-        guarded(ctx, () -> System.out.println(stack.pop()));
+        guarded(ctx, () -> println(stack.pop()));
     }
 
     @Override
@@ -42,9 +54,8 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
             for (int i = 0; i < itemCount; i++) {
                 pStack.push(stack.pop());
             }
-            pStack.stream().forEach(System.out::print);
-            System.out.println();
-            System.out.flush();
+            pStack.stream().forEach(this::print);
+            println("");
         });
     }
 
@@ -152,12 +163,16 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
 
     public void dumpVariables() {
         for (Entry<String, LittleValue> entry : variables.entrySet()) {
-            System.out.println("\t" + entry.getKey() + " : " + entry.getValue());
+            println("\t" + entry.getKey() + " : " + entry.getValue());
         }
     }
 
     public void reset() {
         encounteredError = false;
+    }
+
+    public LittleValue getVar(String varID) {
+        return variables.get(varID);
     }
 
     private void guarded(ParserRuleContext ctx, Runnable runnable) {
@@ -167,7 +182,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
                 try {
                     runnable.run();
                 } catch (LittleCalcRuntimeException lcre) {
-                    System.out.println(lcre.getMessage());
+                    println(lcre.getMessage());
                 }
             }
         }
