@@ -83,7 +83,7 @@ public abstract class LittleValue implements Comparable<LittleValue> {
         if (compareOp == LittleCalcLexer.NE)
             return !this.equals(rhs);
 
-        assertion(type().equals(rhs.type()), "Cannot compare " + type() + " to " + rhs.type());
+        assertion(this.getClass().equals(rhs.getClass()), "Cannot compare " + type() + " to " + rhs.type());
 
         assertion(validCompareForType(compareOp), "Comparison operator ("
                 + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + ") is not valid for " + type() + " values");

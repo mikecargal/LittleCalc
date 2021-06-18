@@ -70,6 +70,12 @@ public class LittleValueTest {
         assertEquals(LINE, lvA.getLine());
         assertEquals(COLUMN, lvA.getColumn());
         assertEquals(AAA, lvA.toString());
+        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvA.bool();
+        });
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvA.number();
+        });
     }
 
     @Test
@@ -81,6 +87,12 @@ public class LittleValueTest {
         assertEquals(LINE, lv1.getLine());
         assertEquals(COLUMN, lv1.getColumn());
         assertEquals("1.0", lv1.toString());
+        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lv1.bool();
+        });
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lv1.string();
+        });
     }
 
     @Test
@@ -92,6 +104,12 @@ public class LittleValueTest {
         assertEquals(LINE, lvTrue.getLine());
         assertEquals(COLUMN, lvTrue.getColumn());
         assertEquals("true", lvTrue.toString());
+        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvTrue.string();
+        });
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvTrue.number();
+        });
     }
 
     @Test
@@ -103,6 +121,12 @@ public class LittleValueTest {
         assertEquals(LINE, lvFalse.getLine());
         assertEquals(COLUMN, lvFalse.getColumn());
         assertEquals("false", lvFalse.toString());
+        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvFalse.string();
+        });
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvFalse.number();
+        });
     }
 
     @Test
