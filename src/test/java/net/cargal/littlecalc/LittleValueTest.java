@@ -164,10 +164,16 @@ public class LittleValueTest {
     @Test
     public void testNumberComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.EQ, lv1);
+            lvA.evalCompare(LittleCalcLexer.LT, lv1);
         });
 
         assertEquals("line:5 col:21 -- Cannot compare STRING to NUMBER", ex.getMessage());
+
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvA.evalCompare(LittleCalcLexer.LT, lvTrue);
+        });
+
+        assertEquals("line:5 col:21 -- Cannot compare STRING to BOOLEAN", ex.getMessage());
     }
 
     @Test
@@ -225,10 +231,16 @@ public class LittleValueTest {
     @Test
     public void testStringComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvTrue.evalCompare(LittleCalcLexer.EQ, lvA);
+            lvA.evalCompare(LittleCalcLexer.LT, lvTrue);
         });
 
-        assertEquals("line:5 col:21 -- Cannot compare BOOLEAN to STRING", ex.getMessage());
+        assertEquals("line:5 col:21 -- Cannot compare STRING to BOOLEAN", ex.getMessage());
+
+        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            lvA.evalCompare(LittleCalcLexer.LT, lv1);
+        });
+
+        assertEquals("line:5 col:21 -- Cannot compare STRING to NUMBER", ex.getMessage());
     }
 
     @Test
@@ -294,11 +306,7 @@ public class LittleValueTest {
 
     @Test
     public void testBoolComparesToOther() {
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.EQ, lvTrue);
-        });
-
-        assertEquals("line:5 col:21 -- Cannot compare STRING to BOOLEAN", ex.getMessage());
+        assertFalse(lvA.evalCompare(LittleCalcLexer.EQ, lvTrue));
     }
 
     @Test
@@ -309,5 +317,13 @@ public class LittleValueTest {
             lv1.evalCompare(LittleCalcLexer.COMMENT, lv2);
         });
         assertEquals("line:5 col:21 -- Comparison operator (COMMENT) is not valid for NUMBER values", ex.getMessage());
+    }
+
+    @Test
+    public void test_EQ_NE_AcrossTypes() {
+        assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvA));
+        assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvTrue));
+        assertFalse(lv1.evalCompare(LittleCalcLexer.EQ, lvA));
+        assertFalse(lv1.evalCompare(LittleCalcLexer.EQ, lvTrue));
     }
 }

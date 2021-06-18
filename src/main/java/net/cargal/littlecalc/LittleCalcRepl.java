@@ -53,7 +53,6 @@ public class LittleCalcRepl {
                     prompt = INITIAL_PROMPT;
                 }
                 replErrListener.reset();
-                listener.reset();
             }
         }
         System.out.println("Exiting...");

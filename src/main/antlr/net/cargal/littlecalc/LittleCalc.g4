@@ -36,7 +36,9 @@ GE:     '>=';
 
 TRUE:  'true';
 FALSE: 'false';
-PRINT: 'print';
+PRINT // one way to handle case-insenstive
+    : [Pp][Rr][Ii][Nn][Tt]
+    ; 
 VARS:  'vars';
 STACK: 'stack';
 
@@ -61,4 +63,4 @@ S_STRING:       '\'' ('\\"' | '\\\'' | .)*? '\'' -> type(STRING);
 ID:             (ALPHA | '_') (ALPHA | DIGIT | '_')*;
 COMMENT:        '//' .*? ('\n' | EOF) -> skip;
 WS:             [ \t\r\n]+            -> skip;
-BAD_TOKEN: .;
+BAD_TOKEN:      .;

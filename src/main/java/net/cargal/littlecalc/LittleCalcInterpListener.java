@@ -16,9 +16,7 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 public class LittleCalcInterpListener extends LittleCalcBaseListener {
     private Map<String, LittleValue> variables = new HashMap<>();
     private Deque<LittleValue> stack = new ArrayDeque<>();
-    private ParserRuleContext previousCtx = null;
-    private boolean encounteredError = false;
-
+ 
     protected void print(Object o) {
         System.out.print(o);
     }
@@ -33,121 +31,98 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
 
     @Override
     public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
-        guarded(ctx, () -> println(stack.pop()));
+        println(stack.pop());
     }
 
     @Override
     public void exitAssignmentStmt(LittleCalcParser.AssignmentStmtContext ctx) {
-        guarded(ctx, () -> {
-            var val = stack.pop();
-            variables.put(ctx.ID().getText(), val);
-            Logger.debug("assignment to " + ctx.ID().getText());
-        });
+        var val = stack.pop();
+        variables.put(ctx.ID().getText(), val);
+        Logger.debug("assignment to " + ctx.ID().getText());
     }
 
     @Override
     public void exitPrintStmt(LittleCalcParser.PrintStmtContext ctx) {
-        guarded(ctx, () -> {
-            int itemCount = ctx.expr().size();
-            Logger.debug("printing " + itemCount + " items.");
-            Deque<LittleValue> pStack = new ArrayDeque<>(itemCount);
-            for (int i = 0; i < itemCount; i++) {
-                pStack.push(stack.pop());
-            }
-            pStack.stream().forEach(this::print);
-            println("");
-        });
+        int itemCount = ctx.expr().size();
+        Logger.debug("printing " + itemCount + " items.");
+        Deque<LittleValue> pStack = new ArrayDeque<>(itemCount);
+        for (int i = 0; i < itemCount; i++) {
+            pStack.push(stack.pop());
+        }
+        pStack.stream().forEach(this::print);
+        println("");
     }
 
     @Override
     public void exitPrintVars(LittleCalcParser.PrintVarsContext ctx) {
-        guarded(ctx, this::dumpVariables);
+        dumpVariables();
     }
 
     @Override
     public void exitIDExpr(LittleCalcParser.IDExprContext ctx) {
-        guarded(ctx, () -> {
-            LittleValue idVal = variables.get(ctx.ID().getText());
-            assertion(idVal != null, ctx.ID().getText() + " has not been assigned a value", ctx);
-            stack.push(idVal);
-        });
+        LittleValue idVal = variables.get(ctx.ID().getText());
+        assertion(idVal != null, ctx.ID().getText() + " has not been assigned a value", ctx);
+        stack.push(idVal);
     }
 
     @Override
     public void exitMulDivExpr(LittleCalcParser.MulDivExprContext ctx) {
-        guarded(ctx, () -> {
-            var rhs = stack.pop().number();
-            var lhs = stack.pop().number();
-            var res = ctx.op.getType() == LittleCalcLexer.MUL ? lhs * rhs : lhs / rhs;
-            stack.push(LittleValue.numberValue(res, ctx));
-        });
+        var rhs = stack.pop().number();
+        var lhs = stack.pop().number();
+        var res = ctx.op.getType() == LittleCalcLexer.MUL ? lhs * rhs : lhs / rhs;
+        stack.push(LittleValue.numberValue(res, ctx));
     }
 
     @Override
     public void exitCompareExpr(LittleCalcParser.CompareExprContext ctx) {
-        guarded(ctx, () -> {
-            var rhs = stack.pop();
-            var lhs = stack.pop();
-            stack.push(LittleValue.booleanValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
-        });
+        var rhs = stack.pop();
+        var lhs = stack.pop();
+        stack.push(LittleValue.booleanValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
     }
 
     @Override
     public void exitExpExpr(LittleCalcParser.ExpExprContext ctx) {
-        guarded(ctx, () -> {
-            var exp = stack.pop().number();
-            var base = stack.pop().number();
-            stack.push(LittleValue.numberValue(Math.pow(base, exp), ctx));
-        });
+        var exp = stack.pop().number();
+        var base = stack.pop().number();
+        stack.push(LittleValue.numberValue(Math.pow(base, exp), ctx));
     }
 
     @Override
     public void exitAddSubExpr(LittleCalcParser.AddSubExprContext ctx) {
-        guarded(ctx, () -> {
-            var rhs = stack.pop().number();
-            var lhs = stack.pop().number();
-            var res = ctx.op.getType() == LittleCalcLexer.ADD ? lhs + rhs : lhs - rhs;
-            stack.push(LittleValue.numberValue(res, ctx));
-        });
+        var rhs = stack.pop().number();
+        var lhs = stack.pop().number();
+        var res = ctx.op.getType() == LittleCalcLexer.ADD ? lhs + rhs : lhs - rhs;
+        stack.push(LittleValue.numberValue(res, ctx));
     }
 
     @Override
     public void exitTernaryExpr(LittleCalcParser.TernaryExprContext ctx) {
-        guarded(ctx, () -> {
-            LittleValue fVal = stack.pop();
-            LittleValue tVal = stack.pop();
-            LittleValue condition = stack.pop();
-            LittleValue res = condition.bool() ? tVal : fVal;
-            stack.push(res);
-        });
+        LittleValue fVal = stack.pop();
+        LittleValue tVal = stack.pop();
+        LittleValue condition = stack.pop();
+        LittleValue res = condition.bool() ? tVal : fVal;
+        stack.push(res);
     }
 
     @Override
     public void exitNumberExpr(LittleCalcParser.NumberExprContext ctx) {
-        guarded(ctx, () -> {
-            stack.push(LittleValue.numberValue(doubleFromToken(ctx.NUMBER()), ctx));
-        });
+        stack.push(LittleValue.numberValue(doubleFromToken(ctx.NUMBER()), ctx));
     }
 
     @Override
     public void exitTrueExpr(LittleCalcParser.TrueExprContext ctx) {
-        guarded(ctx, () -> {
-            stack.push(LittleValue.booleanValue(true, ctx));
-        });
+        stack.push(LittleValue.booleanValue(true, ctx));
     }
 
     @Override
     public void exitFalseExpr(LittleCalcParser.FalseExprContext ctx) {
-        guarded(ctx, () -> {
-            stack.push(LittleValue.booleanValue(false, ctx));
-        });
+        stack.push(LittleValue.booleanValue(false, ctx));
     }
 
     @Override
     public void exitStringExpr(LittleCalcParser.StringExprContext ctx) {
-        guarded(ctx, () -> {
-            stack.push(LittleValue.stringValue(stringFromToken(ctx.STRING()), ctx));
-        });
+
+        stack.push(LittleValue.stringValue(stringFromToken(ctx.STRING()), ctx));
     }
 
     private Double doubleFromToken(TerminalNode token) {
@@ -167,31 +142,13 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         }
     }
 
-    public void reset() {
-        encounteredError = false;
-    }
-
     public LittleValue getVar(String varID) {
         return variables.get(varID);
-    }
-
-    private void guarded(ParserRuleContext ctx, Runnable runnable) {
-        if (ctx != previousCtx) {
-            previousCtx = ctx;
-            if (!encounteredError) {
-                try {
-                    runnable.run();
-                } catch (LittleCalcRuntimeException lcre) {
-                    println(lcre.getMessage());
-                }
-            }
-        }
     }
 
     private void assertion(boolean condition, String message, ParserRuleContext ctx) {
         if (!condition) {
             Token tk = ctx.getStart();
-            encounteredError = true;
             throw new LittleCalcRuntimeException(message, tk.getLine(), tk.getCharPositionInLine());
         }
     }

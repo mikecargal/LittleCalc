@@ -111,7 +111,9 @@ public class LittleValue implements Comparable<LittleValue> {
     }
 
     public boolean evalCompare(int compareOp, LittleValue rhs) {
-        assertion(type() == rhs.type(), "Cannot compare " + type() + " to " + rhs.type());
+        if (compareOp != LittleCalcLexer.EQ && compareOp != LittleCalcLexer.NE) {
+            assertion(type() == rhs.type(), "Cannot compare " + type() + " to " + rhs.type());
+        }
         assertion(validCompareForType(compareOp), "Comparison operator ("
                 + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + ") is not valid for " + type() + " values");
         switch (compareOp) {
@@ -120,9 +122,9 @@ public class LittleValue implements Comparable<LittleValue> {
             case LittleCalcLexer.LE:
                 return compareTo(rhs) <= 0;
             case LittleCalcLexer.EQ:
-                return compareTo(rhs) == 0;
+                return this.equals(rhs);
             case LittleCalcLexer.NE:
-                return compareTo(rhs) != 0;
+                return !this.equals(rhs);
             case LittleCalcLexer.GT:
                 return compareTo(rhs) > 0;
             case LittleCalcLexer.GE:
@@ -145,8 +147,7 @@ public class LittleValue implements Comparable<LittleValue> {
     @Override
     public int compareTo(LittleValue o) {
         switch (type()) {
-            case BOOLEAN:
-                return bool() == o.bool() ? 0 : 1;
+            // case BOOLEAN: boolean only allows Eq && NE (handled elsewhere)
             case STRING:
                 return string().compareTo(o.string());
             case NUMBER:
