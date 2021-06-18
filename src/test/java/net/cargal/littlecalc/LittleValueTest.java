@@ -63,7 +63,6 @@ public class LittleValueTest {
 
     @Test
     public void createsString() {
-        assertEquals(LittleValue.ValueType.STRING, lvA.type());
         assertTrue(lvA.isString());
         assertFalse(lvA.isNumber());
         assertFalse(lvA.isBoolean());
@@ -75,7 +74,6 @@ public class LittleValueTest {
 
     @Test
     public void createsNumber() {
-        assertEquals(LittleValue.ValueType.NUMBER, lv1.type());
         assertTrue(lv1.isNumber());
         assertFalse(lv1.isString());
         assertFalse(lv1.isBoolean());
@@ -87,7 +85,6 @@ public class LittleValueTest {
 
     @Test
     public void createsBooleanTrue() {
-        assertEquals(LittleValue.ValueType.BOOLEAN, lvTrue.type());
         assertTrue(lvTrue.isBoolean());
         assertFalse(lvTrue.isString());
         assertFalse(lvTrue.isNumber());
@@ -99,7 +96,6 @@ public class LittleValueTest {
 
     @Test
     public void createsBooleanFalse() {
-        assertEquals(LittleValue.ValueType.BOOLEAN, lvFalse.type());
         assertTrue(lvFalse.isBoolean());
         assertFalse(lvFalse.isString());
         assertFalse(lvFalse.isNumber());

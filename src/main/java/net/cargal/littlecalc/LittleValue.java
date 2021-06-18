@@ -1,48 +1,20 @@
 package net.cargal.littlecalc;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
-public class LittleValue implements Comparable<LittleValue> {
-    public enum ValueType {
-        NUMBER, STRING, BOOLEAN
-    }
+public abstract class LittleValue implements Comparable<LittleValue> {
+    int[] compareOps = { LittleCalcLexer.EQ, //
+            LittleCalcLexer.NE, //
+            LittleCalcLexer.LT, //
+            LittleCalcLexer.LE, //
+            LittleCalcLexer.GT, //
+            LittleCalcLexer.GE };
 
-    private static final Map<ValueType, Set<Integer>> validCompareTypesMap;
-    static {
-        validCompareTypesMap = new EnumMap<>(ValueType.class);
-        validCompareTypesMap.put(ValueType.BOOLEAN, //
-                new HashSet<>(Arrays.asList( //
-                        LittleCalcLexer.EQ, //
-                        LittleCalcLexer.NE)));
-        validCompareTypesMap.put(ValueType.STRING, //
-                new HashSet<>(Arrays.asList( //
-                        LittleCalcLexer.EQ, //
-                        LittleCalcLexer.NE, //
-                        LittleCalcLexer.LT, //
-                        LittleCalcLexer.LE, //
-                        LittleCalcLexer.GT, //
-                        LittleCalcLexer.GE)));
-        validCompareTypesMap.put(ValueType.NUMBER, //
-                new HashSet<>(Arrays.asList( //
-                        LittleCalcLexer.EQ, //
-                        LittleCalcLexer.NE, //
-                        LittleCalcLexer.LT, //
-                        LittleCalcLexer.LE, //
-                        LittleCalcLexer.GT, //
-                        LittleCalcLexer.GE)));
-    }
-
-    private ValueType vType;
-    private Object value;
     private int line;
     private int column;
 
@@ -54,66 +26,65 @@ public class LittleValue implements Comparable<LittleValue> {
         return column;
     }
 
-    private LittleValue(ValueType vType, Object value, ParserRuleContext ctx) {
-        this.vType = vType;
-        this.value = value;
+    protected LittleValue(ParserRuleContext ctx) {
         Token tk = ctx.getStart();
         line = tk.getLine();
         column = tk.getCharPositionInLine();
     }
 
     static LittleValue numberValue(Double dv, ParserRuleContext ctx) {
-        return new LittleValue(ValueType.NUMBER, dv, ctx);
+        return new LVNumber(dv, ctx);
     }
 
     static LittleValue stringValue(String sv, ParserRuleContext ctx) {
-        return new LittleValue(ValueType.STRING, sv, ctx);
+        return new LVString(sv, ctx);
 
     }
 
     static LittleValue booleanValue(boolean bv, ParserRuleContext ctx) {
-        return new LittleValue(ValueType.BOOLEAN, Boolean.valueOf(bv), ctx);
+        return new LVBoolean(Boolean.valueOf(bv), ctx);
     }
 
     public boolean isBoolean() {
-        return vType == ValueType.BOOLEAN;
+        return false;
     }
 
     public boolean isString() {
-        return vType == ValueType.STRING;
+        return false;
     }
 
     public boolean isNumber() {
-        return vType == ValueType.NUMBER;
+        return false;
     }
 
+    protected abstract Object getValueObject();
+
     public boolean bool() {
-        assertion(isBoolean(), "value is not boolean (" + value + ")");
-        return ((Boolean) value).booleanValue();
+        throw new LittleCalcRuntimeException("value is not boolean (" + getValueObject() + ")", line, column);
     }
 
     public Double number() {
-        assertion(isNumber(), "value is not a Number (" + value + ")");
-        return (Double) value;
+        throw new LittleCalcRuntimeException("value is not a Number (" + getValueObject() + ")", line, column);
     }
 
     public String string() {
-        assertion(isString(), "value is not a String (" + value + ")");
-        return (String) value;
+        throw new LittleCalcRuntimeException("value is not a String (" + getValueObject() + ")", line, column);
     }
 
-    public ValueType type() {
-        return vType;
-    }
+    public abstract String type();
 
     public String toString() {
-        return value.toString();
+        return getValueObject().toString();
     }
 
     public boolean evalCompare(int compareOp, LittleValue rhs) {
-        if (compareOp != LittleCalcLexer.EQ && compareOp != LittleCalcLexer.NE) {
-            assertion(type() == rhs.type(), "Cannot compare " + type() + " to " + rhs.type());
-        }
+        if (compareOp == LittleCalcLexer.EQ)
+            return this.equals(rhs);
+        if (compareOp == LittleCalcLexer.NE)
+            return !this.equals(rhs);
+
+        assertion(type().equals(rhs.type()), "Cannot compare " + type() + " to " + rhs.type());
+
         assertion(validCompareForType(compareOp), "Comparison operator ("
                 + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + ") is not valid for " + type() + " values");
         switch (compareOp) {
@@ -121,10 +92,6 @@ public class LittleValue implements Comparable<LittleValue> {
                 return compareTo(rhs) < 0;
             case LittleCalcLexer.LE:
                 return compareTo(rhs) <= 0;
-            case LittleCalcLexer.EQ:
-                return this.equals(rhs);
-            case LittleCalcLexer.NE:
-                return !this.equals(rhs);
             case LittleCalcLexer.GT:
                 return compareTo(rhs) > 0;
             case LittleCalcLexer.GE:
@@ -134,51 +101,14 @@ public class LittleValue implements Comparable<LittleValue> {
         }
     }
 
-    private boolean validCompareForType(int compareOp) {
-        return validCompareTypesMap.get(type()).contains(compareOp);
+    protected boolean validCompareForType(int compareOp) {
+        return IntStream.of(compareOps).anyMatch(c -> c == compareOp);
     }
 
     private void assertion(boolean condition, String message) {
         if (!condition) {
             throw new LittleCalcRuntimeException(message, line, column);
         }
-    }
-
-    @Override
-    public int compareTo(LittleValue o) {
-        switch (type()) {
-            // case BOOLEAN: boolean only allows Eq && NE (handled elsewhere)
-            case STRING:
-                return string().compareTo(o.string());
-            case NUMBER:
-                return number().compareTo(o.number());
-            default:
-                throw new LittleCalcRuntimeException("Unrecognized value type (" + type() + ")", line, column);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof LittleValue))
-            return false;
-        LittleValue olv = (LittleValue) o;
-        if (!type().equals(olv.type()))
-            return false;
-        switch (type()) {
-            case BOOLEAN:
-                return bool() == olv.bool();
-            case STRING:
-                return string().compareTo(olv.string()) == 0;
-            case NUMBER:
-                return number().compareTo(olv.number()) == 0;
-            default:
-                throw new LittleCalcRuntimeException("Unrecognized value type (" + type() + ")", line, column);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return value.hashCode();
     }
 
 }
