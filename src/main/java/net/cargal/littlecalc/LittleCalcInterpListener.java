@@ -16,22 +16,10 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 public class LittleCalcInterpListener extends LittleCalcBaseListener {
     private Map<String, LittleValue> variables = new HashMap<>();
     private Deque<LittleValue> stack = new ArrayDeque<>();
- 
-    protected void print(Object o) {
-        System.out.print(o);
-    }
-
-    protected void println(Object o) {
-        System.out.println(o);
-    }
-
-    protected void println() {
-        System.out.println();
-    }
 
     @Override
     public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
-        println(stack.pop());
+        System.out.println(stack.pop());
     }
 
     @Override
@@ -49,8 +37,8 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         for (int i = 0; i < itemCount; i++) {
             pStack.push(stack.pop());
         }
-        pStack.stream().forEach(this::print);
-        println("");
+        pStack.stream().forEach(System.out::print);
+        System.out.println();
     }
 
     @Override
@@ -138,7 +126,7 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
 
     public void dumpVariables() {
         for (Entry<String, LittleValue> entry : variables.entrySet()) {
-            println("\t" + entry.getKey() + " : " + entry.getValue());
+            System.out.println("\t" + entry.getKey() + " : " + entry.getValue());
         }
     }
 

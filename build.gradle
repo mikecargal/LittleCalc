@@ -22,13 +22,19 @@ dependencies {
     implementation 'org.tinylog:tinylog-api:2.4.0-M1'
     implementation 'org.tinylog:tinylog-impl:2.4.0-M1'
 
-    // jline used to get history buffer for repl
-    implementation 'org.jline:jline-terminal:3.20.0'
-    implementation 'org.jline:jline-reader:3.20.0'
-    implementation 'org.jline:jline-terminal-jansi:3.20.0'
+    implementation( 'org.jline:jline-terminal:3.20.0') {
+        because 'we want the REPL to have command line histry'
+    }
+    implementation('org.jline:jline-reader:3.20.0') {
+        because 'we want the REPL to have command line histry'
+    }
+    implementation('org.jline:jline-terminal-jansi:3.20.0') {
+        because "jline doesn't work on Windows with this"
+    }
     
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation 'com.github.stefanbirkner:system-lambda:1.2.0'
 }
 
 generateGrammarSource {

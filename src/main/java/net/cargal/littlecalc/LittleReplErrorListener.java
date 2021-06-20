@@ -41,4 +41,8 @@ public class LittleReplErrorListener extends BaseErrorListener {
         return !hasSyntaxError && !errorAtEOF;
     }
 
+    public boolean observedAnError() {
+        return hasSyntaxError;
+    }
+
 }
