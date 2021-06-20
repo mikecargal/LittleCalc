@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
@@ -138,6 +139,7 @@ public class InterpListenerTest {
     }
 
     @Test
+    @Disabled("Move this over to unit testing for REPLListener")
     public void testREPLExpr() {
         interpret(LittleCalcParser::replIn, """
                 2 + 3
@@ -184,4 +186,48 @@ public class InterpListenerTest {
 
         assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage());
     }
+
+    @Test
+    public void testAnd() {
+        interpret(LittleCalcParser::stmts, """
+                a= true && false
+                b= false && true
+                c = true && true
+                d = false && false
+                """);
+        assertFalse(errListener.observedAnError());
+        assertFalse(listener.getVar("a").bool());
+        assertFalse(listener.getVar("b").bool());
+        assertTrue(listener.getVar("c").bool());
+        assertFalse(listener.getVar("d").bool());
+    }
+
+    @Test
+    public void testOr() {
+        interpret(LittleCalcParser::stmts, """
+                a= true || false
+                b= false || true
+                c = true || true
+                d = false || false
+                """);
+        assertFalse(errListener.observedAnError());
+        assertTrue(listener.getVar("a").bool());
+        assertTrue(listener.getVar("b").bool());
+        assertTrue(listener.getVar("c").bool());
+        assertFalse(listener.getVar("d").bool());
+    }
+
+    @Test
+    public void TestNot() {
+        interpret(LittleCalcParser::stmts, """
+                a= !true
+                b= !false
+                """);
+        assertFalse(errListener.observedAnError());
+        assertFalse(listener.getVar("a").bool());
+        assertTrue(listener.getVar("b").bool());
+
+    }
+
+    // TODO: Unit tests to verify precedence
 }

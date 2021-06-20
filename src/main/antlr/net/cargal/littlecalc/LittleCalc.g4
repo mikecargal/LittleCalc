@@ -16,6 +16,9 @@ expr
     | lhs = expr op = ('+' | '-') rhs = expr                   # AddSubExpr
     | lhs = expr op = (LT | LE | EQ | NE | GE | GT) rhs = expr # CompareExpr
     | cond = expr '?' tv = expr ':' fv = expr                  # ternaryExpr
+    | lhs = expr AND rhs = expr                                # andExpr
+    | lhs = expr OR rhs = expr                                 # orExpr
+    | <assoc = right> '!' expr                                 # negationExpr
     | NUMBER                                                   # NumberExpr
     | TRUE                                                     # TrueExpr
     | FALSE                                                    # FalseExpr
@@ -33,12 +36,15 @@ LT:     '<';
 LE:     '<=';
 GT:     '>';
 GE:     '>=';
+NOT:    '!';
+AND:    '&&';
+OR:     '||';
 
 TRUE:  'true';
 FALSE: 'false';
 PRINT // one way to handle case-insenstive
     : [Pp][Rr][Ii][Nn][Tt]
-    ; 
+    ;
 VARS:  'vars';
 STACK: 'stack';
 

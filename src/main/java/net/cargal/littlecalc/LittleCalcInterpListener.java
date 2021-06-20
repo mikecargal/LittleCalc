@@ -11,22 +11,21 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.tinylog.Logger;
 
+import net.cargal.littlecalc.LittleCalcParser.AndExprContext;
+import net.cargal.littlecalc.LittleCalcParser.NegationExprContext;
+import net.cargal.littlecalc.LittleCalcParser.OrExprContext;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LittleCalcInterpListener extends LittleCalcBaseListener {
-    private Map<String, LittleValue> variables = new HashMap<>();
-    private Deque<LittleValue> stack = new ArrayDeque<>();
-
-    @Override
-    public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
-        System.out.println(stack.pop());
-    }
+    protected Map<String, LittleValue> variables = new HashMap<>();
+    protected Deque<LittleValue> stack = new ArrayDeque<>();
 
     @Override
     public void exitAssignmentStmt(LittleCalcParser.AssignmentStmtContext ctx) {
         var val = stack.pop();
-        variables.put(ctx.ID().getText(), val);
-        Logger.debug("assignment to " + ctx.ID().getText());
+        var id = ctx.ID().getText();
+        variables.put(id, val);
+        Logger.debug("assignment to " + id);
     }
 
     @Override
@@ -66,6 +65,25 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
         var rhs = stack.pop();
         var lhs = stack.pop();
         stack.push(LittleValue.booleanValue(lhs.evalCompare(ctx.op.getType(), rhs), ctx));
+    }
+
+    @Override
+    public void exitNegationExpr(NegationExprContext ctx) {
+        stack.push(LittleValue.booleanValue(!stack.pop().bool(), ctx));
+    }
+
+    @Override
+    public void exitAndExpr(AndExprContext ctx) {
+        var rhs = stack.pop();
+        var lhs = stack.pop();
+        stack.push(LittleValue.booleanValue(lhs.bool() && rhs.bool(), ctx));
+    }
+
+    @Override
+    public void exitOrExpr(OrExprContext ctx) {
+        var rhs = stack.pop();
+        var lhs = stack.pop();
+        stack.push(LittleValue.booleanValue(lhs.bool() || rhs.bool(), ctx));
     }
 
     @Override
@@ -109,7 +127,6 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
 
     @Override
     public void exitStringExpr(LittleCalcParser.StringExprContext ctx) {
-
         stack.push(LittleValue.stringValue(stringFromToken(ctx.STRING()), ctx));
     }
 
@@ -140,4 +157,5 @@ public class LittleCalcInterpListener extends LittleCalcBaseListener {
             throw new LittleCalcRuntimeException(message, tk.getLine(), tk.getCharPositionInLine());
         }
     }
+
 }
