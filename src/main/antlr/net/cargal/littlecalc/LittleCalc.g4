@@ -18,7 +18,7 @@ expr
     | cond = expr '?' tv = expr ':' fv = expr                  # ternaryExpr
     | lhs = expr AND rhs = expr                                # andExpr
     | lhs = expr OR rhs = expr                                 # orExpr
-    | <assoc = right> '!' expr                                 # negationExpr
+    | '!' expr                                                 # negationExpr
     | NUMBER                                                   # NumberExpr
     | TRUE                                                     # TrueExpr
     | FALSE                                                    # FalseExpr
