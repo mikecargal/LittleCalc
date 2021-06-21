@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
-public class LittleValueTest {
+class LittleValueTest {
     private static final double D1_0 = 1.0;
     private static final double D2_0 = 2.0;
     private static final double D3_0 = 3.0;
@@ -62,7 +62,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void createsString() {
+    void createsString() {
         assertTrue(lvA.isString());
         assertFalse(lvA.isNumber());
         assertFalse(lvA.isBoolean());
@@ -70,16 +70,16 @@ public class LittleValueTest {
         assertEquals(LINE, lvA.getLine());
         assertEquals(COLUMN, lvA.getColumn());
         assertEquals(AAA, lvA.toString());
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvA.bool();
         });
-        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvA.number();
         });
     }
 
     @Test
-    public void createsNumber() {
+    void createsNumber() {
         assertTrue(lv1.isNumber());
         assertFalse(lv1.isString());
         assertFalse(lv1.isBoolean());
@@ -87,16 +87,16 @@ public class LittleValueTest {
         assertEquals(LINE, lv1.getLine());
         assertEquals(COLUMN, lv1.getColumn());
         assertEquals("1.0", lv1.toString());
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lv1.bool();
         });
-        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lv1.string();
         });
     }
 
     @Test
-    public void createsBooleanTrue() {
+    void createsBooleanTrue() {
         assertTrue(lvTrue.isBoolean());
         assertFalse(lvTrue.isString());
         assertFalse(lvTrue.isNumber());
@@ -104,16 +104,16 @@ public class LittleValueTest {
         assertEquals(LINE, lvTrue.getLine());
         assertEquals(COLUMN, lvTrue.getColumn());
         assertEquals("true", lvTrue.toString());
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvTrue.string();
         });
-        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvTrue.number();
         });
     }
 
     @Test
-    public void createsBooleanFalse() {
+    void createsBooleanFalse() {
         assertTrue(lvFalse.isBoolean());
         assertFalse(lvFalse.isString());
         assertFalse(lvFalse.isNumber());
@@ -121,68 +121,67 @@ public class LittleValueTest {
         assertEquals(LINE, lvFalse.getLine());
         assertEquals(COLUMN, lvFalse.getColumn());
         assertEquals("false", lvFalse.toString());
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvFalse.string();
         });
-        ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+        assertThrows(LittleCalcRuntimeException.class, () -> {
             lvFalse.number();
         });
     }
 
     @Test
-    public void testNumberComparesLT() {
+    void testNumberComparesLT() {
         assertTrue(lv1.evalCompare(LittleCalcLexer.LT, lv2));
         assertFalse(lv2.evalCompare(LittleCalcLexer.LT, lv1));
     }
 
     @Test
-    public void testNumberComparesLE() {
+    void testNumberComparesLE() {
         assertTrue(lv1.evalCompare(LittleCalcLexer.LE, lv2));
         assertTrue(lv2.evalCompare(LittleCalcLexer.LE, lv2Dup));
     }
 
     @Test
-    public void testNumberComparesEQ() {
+    void testNumberComparesEQ() {
         assertTrue(lv2.evalCompare(LittleCalcLexer.EQ, lv2Dup));
         assertFalse(lv3.evalCompare(LittleCalcLexer.EQ, lv2));
     }
 
     @Test
-    public void testNumberComparesNE() {
+    void testNumberComparesNE() {
         assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lv2));
         assertFalse(lv2.evalCompare(LittleCalcLexer.NE, lv2Dup));
     }
 
     @Test
-    public void testNumberComparesGE() {
+    void testNumberComparesGE() {
         assertTrue(lv3.evalCompare(LittleCalcLexer.GE, lv2));
         assertTrue(lv2.evalCompare(LittleCalcLexer.GE, lv2Dup));
         assertFalse(lv1.evalCompare(LittleCalcLexer.GE, lv2));
     }
 
     @Test
-    public void testNumberComparesGT() {
+    void testNumberComparesGT() {
         assertTrue(lv3.evalCompare(LittleCalcLexer.GT, lv2));
         assertFalse(lv2.evalCompare(LittleCalcLexer.GT, lv2Dup));
     }
 
     @Test
-    public void testNumberEqual() {
+    void testNumberEqual() {
 
         assertEquals(lv2, lv2Dup);
         assertNotEquals(lv1, lv2);
         assertNotEquals(lvA, lv2);
-        assertFalse(lv1.equals(D1_0));
     }
 
     @Test
-    public void testNumberhash() {
+    void testNumberhash() {
         assertEquals(lv2.hashCode(), lv2Dup.hashCode());
         assertNotEquals(lv1.hashCode(), lv2.hashCode());
     }
 
     @Test
-    public void testNumberComparesToOther() {
+    void testNumberComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             lvA.evalCompare(LittleCalcLexer.LT, lv1);
         });
@@ -197,59 +196,58 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testStringComparesLT() {
+    void testStringComparesLT() {
         assertTrue(lvA.evalCompare(LittleCalcLexer.LT, lvB));
         assertFalse(lvB.evalCompare(LittleCalcLexer.LT, lvA));
     }
 
     @Test
-    public void testStringComparesLE() {
+    void testStringComparesLE() {
         assertTrue(lvA.evalCompare(LittleCalcLexer.LE, lvB));
         assertTrue(lvB.evalCompare(LittleCalcLexer.LE, lvBDup));
         assertFalse(lvC.evalCompare(LittleCalcLexer.LE, lvB));
     }
 
     @Test
-    public void testStringComparesEQ() {
+    void testStringComparesEQ() {
         assertTrue(lvB.evalCompare(LittleCalcLexer.EQ, lvBDup));
         assertFalse(lvC.evalCompare(LittleCalcLexer.EQ, lvB));
     }
 
     @Test
-    public void testStringComparesNE() {
+    void testStringComparesNE() {
         assertTrue(lvA.evalCompare(LittleCalcLexer.NE, lvB));
         assertFalse(lvB.evalCompare(LittleCalcLexer.NE, lvBDup));
     }
 
     @Test
-    public void testStringComparesGE() {
+    void testStringComparesGE() {
         assertTrue(lvC.evalCompare(LittleCalcLexer.GE, lvB));
         assertTrue(lvB.evalCompare(LittleCalcLexer.GE, lvBDup));
         assertFalse(lvA.evalCompare(LittleCalcLexer.GE, lvB));
     }
 
     @Test
-    public void testStringComparesGT() {
+    void testStringComparesGT() {
         assertTrue(lvC.evalCompare(LittleCalcLexer.GT, lvB));
         assertFalse(lvB.evalCompare(LittleCalcLexer.GT, lvBDup));
     }
 
     @Test
-    public void testStringEquals() {
+    void testStringEquals() {
         assertEquals(lvB, lvBDup);
         assertNotEquals(lvA, lvB);
         assertNotEquals(lvTrue, lvB);
-        assertFalse(lvA.equals(AAA));
     }
 
     @Test
-    public void testStringHash() {
+    void testStringHash() {
         assertEquals(lvB.hashCode(), lvBDup.hashCode());
         assertNotEquals(lvA.hashCode(), lvB.hashCode());
     }
 
     @Test
-    public void testStringComparesToOther() {
+    void testStringComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             lvA.evalCompare(LittleCalcLexer.LT, lvTrue);
         });
@@ -264,14 +262,14 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolComparesEQ() {
+    void testBoolComparesEQ() {
         assertTrue(lvFalse.evalCompare(LittleCalcLexer.EQ, lvFalseDup));
         assertTrue(lvTrue.evalCompare(LittleCalcLexer.EQ, lvTrueDup));
         assertFalse(lvTrue.evalCompare(LittleCalcLexer.EQ, lvFalse));
     }
 
     @Test
-    public void testBoolComparesNE() {
+    void testBoolComparesNE() {
         assertTrue(lvTrue.evalCompare(LittleCalcLexer.NE, lvFalse));
         assertTrue(lvFalse.evalCompare(LittleCalcLexer.NE, lvTrue));
         assertFalse(lvTrue.evalCompare(LittleCalcLexer.NE, lvTrueDup));
@@ -279,7 +277,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolFailsLT() {
+    void testBoolFailsLT() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             assertTrue(lvTrue.evalCompare(LittleCalcLexer.LT, lvFalse));
         });
@@ -287,7 +285,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolFailsLE() {
+    void testBoolFailsLE() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             assertTrue(lvTrue.evalCompare(LittleCalcLexer.LE, lvFalse));
         });
@@ -295,7 +293,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolFailsGE() {
+    void testBoolFailsGE() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             assertTrue(lvTrue.evalCompare(LittleCalcLexer.GE, lvFalse));
         });
@@ -303,7 +301,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolFailsGT() {
+    void testBoolFailsGT() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
             assertTrue(lvTrue.evalCompare(LittleCalcLexer.GT, lvFalse));
         });
@@ -311,26 +309,25 @@ public class LittleValueTest {
     }
 
     @Test
-    public void testBoolEquals() {
+    void testBoolEquals() {
         assertEquals(lvFalse, lvFalseDup);
         assertNotEquals(lvTrue, lvFalse);
         assertNotEquals(lvA, lvTrue);
-        assertFalse(lvTrue.equals(true));
     }
 
     @Test
-    public void testBoolhash() {
+    void testBoolhash() {
         assertEquals(lvTrue.hashCode(), lvTrue.hashCode());
         assertNotEquals(lvTrue.hashCode(), lvFalse.hashCode());
     }
 
     @Test
-    public void testBoolComparesToOther() {
+    void testBoolComparesToOther() {
         assertFalse(lvA.evalCompare(LittleCalcLexer.EQ, lvTrue));
     }
 
     @Test
-    public void testBadCompareOp() {
+    void testBadCompareOp() {
         var lv1 = LittleValue.numberValue(1.0, mockContext);
         var lv2 = LittleValue.numberValue(2.0, mockContext);
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
@@ -340,7 +337,7 @@ public class LittleValueTest {
     }
 
     @Test
-    public void test_EQ_NE_AcrossTypes() {
+    void test_EQ_NE_AcrossTypes() {
         assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvA));
         assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvTrue));
         assertFalse(lv1.evalCompare(LittleCalcLexer.EQ, lvA));

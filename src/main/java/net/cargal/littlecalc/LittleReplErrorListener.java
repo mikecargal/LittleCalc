@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.Recognizer;
 
 public class LittleReplErrorListener extends BaseErrorListener {
     private boolean errorAtEOF = false;
-    private boolean hasSyntaxError = false;
 
     @Override
     public void syntaxError( //
@@ -19,30 +18,16 @@ public class LittleReplErrorListener extends BaseErrorListener {
         if (e != null && e.getOffendingToken().getType() == Recognizer.EOF) {
             errorAtEOF = true;
         } else {
-            hasSyntaxError = true;
-            reportError("line " + line + ":" + charPositionInLine + " " + msg);
+            super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
         }
-    }
-
-    protected void reportError(String str) {
-        System.err.println(str);
     }
 
     public void reset() {
         errorAtEOF = false;
-        hasSyntaxError = false;
     }
 
     public boolean incompleteInput() {
-        return errorAtEOF && !hasSyntaxError;
-    }
-
-    public boolean canProcessReplInput() {
-        return !hasSyntaxError && !errorAtEOF;
-    }
-
-    public boolean observedAnError() {
-        return hasSyntaxError;
+        return errorAtEOF ;
     }
 
 }

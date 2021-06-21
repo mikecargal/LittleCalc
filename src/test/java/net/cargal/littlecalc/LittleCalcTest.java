@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class LittleCalcTest {
-    @Test public void testAppHasAGreeting() {
+class LittleCalcTest {
+    @Test void testAppHasAGreeting() {
         var classUnderTest = new LittleCalc();
         assertEquals(classUnderTest.getClass(),LittleCalc.class);
     }

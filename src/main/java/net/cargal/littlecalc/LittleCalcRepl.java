@@ -49,7 +49,8 @@ public class LittleCalcRepl {
                 parser.setTokenStream(tokenStream);
                 parser.setTrace(listener.isTracing());
                 var replTree = parser.replIn();
-                if (replErrListener.canProcessReplInput()) {
+                if ((!replErrListener.incompleteInput()) && //
+                        (parser.getNumberOfSyntaxErrors() == 0)) {
                     ParseTreeWalker.DEFAULT.walk(listener, replTree);
                 }
                 if (replErrListener.incompleteInput()) {

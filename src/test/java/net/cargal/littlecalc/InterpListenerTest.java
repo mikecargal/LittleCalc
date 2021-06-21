@@ -23,12 +23,13 @@ public class InterpListenerTest {
     private LittleCalcInterpListener listener;
     private LittleReplErrorListener errListener;
     private String capturedOutput;
+    private LittleCalcParser parser;
 
     private void interpret(Function<LittleCalcParser, ParserRuleContext> parseRule, String source) {
         var charStream = CharStreams.fromString(source);
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
-        var parser = new LittleCalcParser(tokenStream);
+        parser = new LittleCalcParser(tokenStream);
         listener = new LittleCalcInterpListener();
         parser.removeErrorListeners();
         errListener = new LittleReplErrorListener();
@@ -36,7 +37,8 @@ public class InterpListenerTest {
         try {
             capturedOutput = tapSystemErrAndOutNormalized(() -> {
                 var pt = parseRule.apply(parser);
-                if (errListener.canProcessReplInput()) {
+                if ((!errListener.incompleteInput()) && //
+                (parser.getNumberOfSyntaxErrors() == 0)) {
                     ParseTreeWalker.DEFAULT.walk(listener, pt);
                 }
             });
@@ -50,7 +52,7 @@ public class InterpListenerTest {
     @Test
     public void testNumberAssignment() {
         interpret(LittleCalcParser::replIn, "a=1.0");
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(1.0, listener.getVar("a").number());
     }
 
@@ -61,7 +63,7 @@ public class InterpListenerTest {
                 b=false
                 c = 3 < 4
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertTrue(listener.getVar("a").bool());
         assertFalse(listener.getVar("b").bool());
         assertTrue(listener.getVar("c").bool());
@@ -73,7 +75,7 @@ public class InterpListenerTest {
                 a='Mike'
                 b="Chris"
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals("Mike", listener.getVar("a").string());
         assertEquals("Chris", listener.getVar("b").string());
     }
@@ -85,7 +87,7 @@ public class InterpListenerTest {
                 b=9-8
                 c=9-8+7
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(17.0, listener.getVar("a").number());
         assertEquals(1.0, listener.getVar("b").number());
         assertEquals(8.0, listener.getVar("c").number());
@@ -98,7 +100,7 @@ public class InterpListenerTest {
                 b=9/3
                 c=9/3*7
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(72.0, listener.getVar("a").number());
         assertEquals(3.0, listener.getVar("b").number());
         assertEquals(21.0, listener.getVar("c").number());
@@ -111,7 +113,7 @@ public class InterpListenerTest {
                 b=25^0.5
                 c=2^4^0.5
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(4.0, listener.getVar("a").number());
         assertEquals(5.0, listener.getVar("b").number());
         assertEquals(4.0, listener.getVar("c").number());
@@ -124,7 +126,7 @@ public class InterpListenerTest {
                 b= false ? 2 : 3
                 c= 2<3 ? "yes" : "no"
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(2.0, listener.getVar("a").number());
         assertEquals(3.0, listener.getVar("b").number());
         assertEquals("yes", listener.getVar("c").string());
@@ -144,7 +146,7 @@ public class InterpListenerTest {
         interpret(LittleCalcParser::replIn, """
                 2 + 3
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals("5.0", capturedOutput.trim());
     }
 
@@ -154,7 +156,7 @@ public class InterpListenerTest {
                 a = true
                 Print "The test worked = " a
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals("The test worked = true", capturedOutput.trim());
 
     }
@@ -167,7 +169,7 @@ public class InterpListenerTest {
                 c = b < 2
                 vars
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         var expected = """
                 \ta : Test
                 \tb : 0.5
@@ -195,7 +197,7 @@ public class InterpListenerTest {
                 c = true && true
                 d = false && false
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertFalse(listener.getVar("a").bool());
         assertFalse(listener.getVar("b").bool());
         assertTrue(listener.getVar("c").bool());
@@ -210,7 +212,7 @@ public class InterpListenerTest {
                 c = true || true
                 d = false || false
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertTrue(listener.getVar("a").bool());
         assertTrue(listener.getVar("b").bool());
         assertTrue(listener.getVar("c").bool());
@@ -223,7 +225,7 @@ public class InterpListenerTest {
                 a= !true
                 b= !false
                 """);
-        assertFalse(errListener.observedAnError());
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertFalse(listener.getVar("a").bool());
         assertTrue(listener.getVar("b").bool());
 
