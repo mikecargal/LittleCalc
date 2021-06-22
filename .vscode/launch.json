@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch LittleCalcInterp",
+            "request": "launch",
+            "mainClass": "net.cargal.littlecalc.LittleCalcInterp",
+            "projectName": "LittleCalc"
+        },
+        {
+            "type": "java",
+            "name": "Launch LittleCalcRepl",
+            "request": "launch",
+            "mainClass": "net.cargal.littlecalc.LittleCalcRepl",
+            "projectName": "LittleCalc"
+        },
+        {
+            "name": "antlr4-littleCalcRepl",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "${workspaceFolder}/little.ltl",
+            "grammar": "${workspaceFolder}/src/main/antlr/net/cargal/littlecalc/LittleCalc.g4",
+            "startRule": "stmts",
+            "printParseTree": true,
+            "visualParseTree": true
+        }
+    ]
+}
