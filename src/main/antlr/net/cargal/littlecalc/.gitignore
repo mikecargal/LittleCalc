@@ -1,4 +1,6 @@
 *
 !*.g4
 !*.sh
+!graphs_prelude.html
+!graphs_prologue.html
 !.gitignore
