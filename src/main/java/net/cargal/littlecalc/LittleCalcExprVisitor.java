@@ -28,9 +28,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
 
     @Override
     protected LittleValue aggregateResult(LittleValue aggregate, LittleValue nextResult) {
-        if (aggregate != null)
-            return aggregate;
-        return nextResult;
+        return (nextResult != null) ? nextResult : aggregate;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
 
     @Override
     public LittleValue visitExpExpr(ExpExprContext ctx) {
-        return LittleValue.numberValue(Math.pow(number(ctx.base), number(ctx.exp)), ctx);
+        return lvNumber(Math.pow(number(ctx.base), number(ctx.exp)), ctx);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
         var res = ctx.op.getType() == LittleCalcLexer.MUL //
                 ? number(ctx.lhs) * number(ctx.rhs) //
                 : number(ctx.lhs) / number(ctx.rhs);
-        return LittleValue.numberValue(res, ctx);
+        return lvNumber(res, ctx);
     }
 
     @Override
@@ -58,7 +56,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
         var res = ctx.op.getType() == LittleCalcLexer.ADD //
                 ? number(ctx.lhs) + number(ctx.rhs) //
                 : number(ctx.lhs) - number(ctx.rhs);
-        return LittleValue.numberValue(res, ctx);
+        return lvNumber(res, ctx);
     }
 
     @Override
@@ -68,39 +66,38 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
 
     @Override
     public LittleValue visitCompareExpr(CompareExprContext ctx) {
-        return LittleValue.booleanValue( //
-                visit(ctx.lhs).evalCompare(LVComparableOp.fromToken(ctx.op), visit(ctx.lhs)), //
-                ctx);
+        var res = visit(ctx.lhs).evalCompare(LVComparableOp.fromToken(ctx.op), visit(ctx.lhs));
+        return lvBool(res, ctx);
     }
 
     @Override
     public LittleValue visitNegationExpr(NegationExprContext ctx) {
-        return LittleValue.booleanValue(!bool(ctx.expr()), ctx);
+        return lvBool(!bool(ctx.expr()), ctx);
     }
 
     @Override
     public LittleValue visitAndExpr(AndExprContext ctx) {
-        return LittleValue.booleanValue(bool(ctx.lhs) && bool(ctx.rhs), ctx);
+        return lvBool(bool(ctx.lhs) && bool(ctx.rhs), ctx);
     }
 
     @Override
     public LittleValue visitOrExpr(OrExprContext ctx) {
-        return LittleValue.booleanValue(bool(ctx.lhs) || bool(ctx.rhs), ctx);
+        return lvBool(bool(ctx.lhs) || bool(ctx.rhs), ctx);
     }
 
     @Override
     public LittleValue visitNumberExpr(NumberExprContext ctx) {
-        return LittleValue.numberValue(doubleFromToken(ctx.NUMBER()), ctx);
+        return lvNumber(doubleFromToken(ctx.NUMBER()), ctx);
     }
 
     @Override
     public LittleValue visitTrueExpr(TrueExprContext ctx) {
-        return LittleValue.booleanValue(true, ctx);
+        return lvBool(true, ctx);
     }
 
     @Override
     public LittleValue visitFalseExpr(FalseExprContext ctx) {
-        return LittleValue.booleanValue(false, ctx);
+        return lvBool(false, ctx);
     }
 
     @Override
@@ -132,6 +129,14 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
 
     private boolean bool(ParserRuleContext ctx) {
         return visit(ctx).bool();
+    }
+
+    private LittleValue lvNumber(double dv, ParserRuleContext ctx) {
+        return LittleValue.numberValue(dv, ctx);
+    }
+
+    private LittleValue lvBool(boolean bv, ParserRuleContext ctx) {
+        return LittleValue.booleanValue(bv, ctx);
     }
 
 }
