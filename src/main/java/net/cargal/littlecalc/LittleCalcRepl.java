@@ -29,7 +29,8 @@ public class LittleCalcRepl {
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);
-        var listener = new LittleCalcREPLListener(parser);
+        var listener = new LittleCalcSemanticValidationListener();
+        var executionVisitor = new LittleCalcREPLVisitor(parser);
         parser.removeErrorListeners();
         var replErrListener = new LittleReplErrorListener();
         parser.addErrorListener(replErrListener);
@@ -47,11 +48,14 @@ public class LittleCalcRepl {
                 lexer.setInputStream(charStream);
                 tokenStream.setTokenSource(lexer);
                 parser.setTokenStream(tokenStream);
-                parser.setTrace(listener.isTracing());
+                parser.setTrace(executionVisitor.isTracing());
                 var replTree = parser.replIn();
                 if ((!replErrListener.incompleteInput()) && //
                         (parser.getNumberOfSyntaxErrors() == 0)) {
                     ParseTreeWalker.DEFAULT.walk(listener, replTree);
+                    if (!listener.hasErrors()) {
+                        executionVisitor.visit(replTree);
+                    }
                 }
                 if (replErrListener.incompleteInput()) {
                     prompt = CONTINUE_PROMPT;
@@ -60,6 +64,7 @@ public class LittleCalcRepl {
                     prompt = INITIAL_PROMPT;
                 }
                 replErrListener.reset();
+                listener.reset();
             }
         }
         System.out.println("Exiting...");

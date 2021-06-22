@@ -20,7 +20,7 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class InterpListenerTest {
 
-    private LittleCalcInterpListener listener;
+    private LittleCalcSemanticValidationListener listener;
     private LittleReplErrorListener errListener;
     private String capturedOutput;
     private LittleCalcParser parser;
@@ -30,7 +30,7 @@ public class InterpListenerTest {
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
-        listener = new LittleCalcInterpListener();
+        listener = new LittleCalcSemanticValidationListener();
         parser.removeErrorListeners();
         errListener = new LittleReplErrorListener();
         parser.addErrorListener(errListener);

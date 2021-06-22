@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.tinylog.Logger;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
@@ -14,11 +15,16 @@ public class LittleCalcInterp {
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);
-        var listener = new LittleCalcInterpListener();
-        parser.addParseListener(listener);
+        var listener = new LittleCalcSemanticValidationListener();
+
         try {
-            parser.stmts();
-            listener.dumpVariables();
+            var stmts = parser.stmts();
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                ParseTreeWalker.DEFAULT.walk(listener, stmts);
+                if (!listener.hasErrors()) {
+                    new LittleCalcInterpVisitor().visit(stmts);
+                }
+            }
         } catch (LittleCalcRuntimeException lcre) {
             Logger.error(lcre.getMessage());
         }

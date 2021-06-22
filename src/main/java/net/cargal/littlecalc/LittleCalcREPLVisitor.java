@@ -3,24 +3,27 @@ package net.cargal.littlecalc;
 import org.antlr.v4.runtime.Parser;
 
 import net.cargal.littlecalc.LittleCalcParser.AssignmentStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.ReplExprContext;
 
-public class LittleCalcREPLListener extends LittleCalcInterpListener {
-    private Parser parser;
+public class LittleCalcREPLVisitor extends LittleCalcInterpVisitor {
     private boolean tracing = false;
 
-    public LittleCalcREPLListener(Parser parser) {
+    public LittleCalcREPLVisitor(Parser parser) {
         this.parser = parser;
     }
 
     @Override
-    public void exitReplExpr(LittleCalcParser.ReplExprContext ctx) {
+    public Void visitReplExpr(ReplExprContext ctx) {
+        super.visitReplExpr(ctx);
         System.out.println(stack.pop());
+        return null;
     }
 
     @Override
-    public void exitAssignmentStmt(AssignmentStmtContext ctx) {
-        super.exitAssignmentStmt(ctx);
+    public Void visitAssignmentStmt(AssignmentStmtContext ctx) {
+        super.visitAssignmentStmt(ctx);
         processCommand(ctx.ID().getText());
+        return null;
     }
 
     private void processCommand(String cmd) {
@@ -28,6 +31,10 @@ public class LittleCalcREPLListener extends LittleCalcInterpListener {
             tracing = getVar(cmd).bool();
             System.out.println("Tracing " + (tracing ? "On" : "Off"));
             parser.setTrace(getVar(cmd).bool());
+        }
+        if ("debug".equalsIgnoreCase(cmd)) {
+            debugging = getVar(cmd).bool();
+            System.out.println("debug " + (debugging ? "On" : "Off"));
         }
     }
 

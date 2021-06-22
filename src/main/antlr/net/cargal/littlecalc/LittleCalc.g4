@@ -10,20 +10,21 @@ stmt
     | VARS        # printVars
     ;
 expr
-    : '(' expr ')'                                             # ParenExpr
-    | <assoc = right> base = expr '^' exp = expr               # ExpExpr
-    | lhs = expr op = ('*' | '/') rhs = expr                   # MulDivExpr
-    | lhs = expr op = ('+' | '-') rhs = expr                   # AddSubExpr
-    | lhs = expr op = (LT | LE | EQ | NE | GE | GT) rhs = expr # CompareExpr
-    | cond = expr '?' tv = expr ':' fv = expr                  # ternaryExpr
-    | lhs = expr AND rhs = expr                                # andExpr
-    | lhs = expr OR rhs = expr                                 # orExpr
-    | '!' expr                                                 # negationExpr
-    | NUMBER                                                   # NumberExpr
-    | TRUE                                                     # TrueExpr
-    | FALSE                                                    # FalseExpr
-    | STRING                                                   # StringExpr
-    | ID                                                       # IDExpr
+    : '(' expr ')'                                   # ParenExpr
+    | <assoc = right> base = expr '^' exp = expr     # ExpExpr
+    | lhs = expr op = ('*' | '/') rhs = expr         # MulDivExpr
+    | lhs = expr op = ('+' | '-') rhs = expr         # AddSubExpr
+    | lhs = expr op = (LT | LE | GE | GT) rhs = expr # CompareExpr
+    | lhs = expr op = (EQ | NE) rhs = expr           # EqualityExpr
+    | cond = expr '?' tv = expr ':' fv = expr        # ternaryExpr
+    | lhs = expr AND rhs = expr                      # andExpr
+    | lhs = expr OR rhs = expr                       # orExpr
+    | '!' expr                                       # negationExpr
+    | NUMBER                                         # NumberExpr
+    | TRUE                                           # TrueExpr
+    | FALSE                                          # FalseExpr
+    | STRING                                         # StringExpr
+    | ID                                             # IDExpr
     ;
 
 // keywords
@@ -42,9 +43,9 @@ OR:     '||';
 
 TRUE:  'true';
 FALSE: 'false';
-PRINT // one way to handle case-insenstive
+PRINT
     : [Pp][Rr][Ii][Nn][Tt]
-    ;
+    ; // one way to handle case-insenstive
 VARS:  'vars';
 STACK: 'stack';
 
