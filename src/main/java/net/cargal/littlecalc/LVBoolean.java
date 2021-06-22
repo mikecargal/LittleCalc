@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class LVBoolean extends LittleValue {
     private Boolean value;
 
-    public LVBoolean(Boolean value, ParserRuleContext ctx) {
-        super(ctx);
+    public LVBoolean(Boolean value, int line, int column) {
+        super(line, column);
         this.value = value;
     }
 
@@ -23,11 +23,6 @@ public class LVBoolean extends LittleValue {
     @Override
     public boolean bool() {
         return value;
-    }
-
-    @Override
-    protected boolean validCompareForType(int compareOp) {
-        return compareOp == LittleCalcLexer.EQ || compareOp == LittleCalcLexer.NE;
     }
 
     @Override

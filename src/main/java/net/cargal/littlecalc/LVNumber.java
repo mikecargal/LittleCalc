@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 public class LVNumber extends LittleValue {
     private Double value;
 
-    public LVNumber(Double value, ParserRuleContext ctx) {
-        super(ctx);
+    public LVNumber(Double value, int line, int column) {
+        super(line,column);
         this.value = value;
     }
 

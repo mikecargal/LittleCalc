@@ -1,19 +1,11 @@
 package net.cargal.littlecalc;
 
-import java.util.stream.IntStream;
-
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public abstract class LittleValue implements Comparable<LittleValue> {
-    int[] compareOps = { LittleCalcLexer.EQ, //
-            LittleCalcLexer.NE, //
-            LittleCalcLexer.LT, //
-            LittleCalcLexer.LE, //
-            LittleCalcLexer.GT, //
-            LittleCalcLexer.GE };
 
     private int line;
     private int column;
@@ -26,23 +18,36 @@ public abstract class LittleValue implements Comparable<LittleValue> {
         return column;
     }
 
-    protected LittleValue(ParserRuleContext ctx) {
-        Token tk = ctx.getStart();
-        line = tk.getLine();
-        column = tk.getCharPositionInLine();
+    protected LittleValue(int line, int column) {
+        this.line = line;
+        this.column = column;
     }
 
     static LittleValue numberValue(Double dv, ParserRuleContext ctx) {
-        return new LVNumber(dv, ctx);
+        Token tk = ctx.getStart();
+        return new LVNumber(dv, tk.getLine(), tk.getCharPositionInLine());
     }
 
     static LittleValue stringValue(String sv, ParserRuleContext ctx) {
-        return new LVString(sv, ctx);
-
+        Token tk = ctx.getStart();
+        return new LVString(sv, tk.getLine(), tk.getCharPositionInLine());
     }
 
     static LittleValue booleanValue(boolean bv, ParserRuleContext ctx) {
-        return new LVBoolean(Boolean.valueOf(bv), ctx);
+        Token tk = ctx.getStart();
+        return new LVBoolean(Boolean.valueOf(bv), tk.getLine(), tk.getCharPositionInLine());
+    }
+
+    static LittleValue numberValue(Double dv, int line, int column) {
+        return new LVNumber(dv, line, column);
+    }
+
+    static LittleValue stringValue(String sv, int line, int column) {
+        return new LVString(sv, line, column);
+    }
+
+    static LittleValue booleanValue(boolean bv, int line, int column) {
+        return new LVBoolean(Boolean.valueOf(bv), line, column);
     }
 
     public boolean isBoolean() {
@@ -77,38 +82,27 @@ public abstract class LittleValue implements Comparable<LittleValue> {
         return getValueObject().toString();
     }
 
-    public boolean evalCompare(int compareOp, LittleValue rhs) {
-        if (compareOp == LittleCalcLexer.EQ)
-            return this.equals(rhs);
-        if (compareOp == LittleCalcLexer.NE)
-            return !this.equals(rhs);
-
-        assertion(this.getClass().equals(rhs.getClass()), "Cannot compare " + type() + " to " + rhs.type());
-
-        assertion(validCompareForType(compareOp), "Comparison operator ("
-                + LittleCalcLexer.VOCABULARY.getDisplayName(compareOp) + ") is not valid for " + type() + " values");
-        switch (compareOp) {
-            case LittleCalcLexer.LT:
-                return compareTo(rhs) < 0;
-            case LittleCalcLexer.LE:
-                return compareTo(rhs) <= 0;
-            case LittleCalcLexer.GT:
-                return compareTo(rhs) > 0;
-            case LittleCalcLexer.GE:
-                return compareTo(rhs) >= 0;
-            default:
-                throw new LittleCalcRuntimeException("Unhandled compareOp = " + compareOp, line, column);
-        }
+    public boolean evalCompare(LVComparableOp op, LittleValue rhs) {
+        return switch (op) {
+            case LT:
+                yield compareTo(rhs) < 0;
+            case LE:
+                yield compareTo(rhs) <= 0;
+            case GT:
+                yield compareTo(rhs) > 0;
+            case GE:
+                yield compareTo(rhs) >= 0;
+        };
     }
 
-    protected boolean validCompareForType(int compareOp) {
-        return IntStream.of(compareOps).anyMatch(c -> c == compareOp);
+    public boolean evalEquality(LVEquatableOp op, LittleValue rhs) {
+        return (op == LVEquatableOp.EQ) ? equals(rhs) : !equals(rhs);
     }
 
-    private void assertion(boolean condition, String message) {
-        if (!condition) {
-            throw new LittleCalcRuntimeException(message, line, column);
-        }
-    }
+    // private void assertion(boolean condition, String message) {
+    // if (!condition) {
+    // throw new LittleCalcRuntimeException(message, line, column);
+    // }
+    // }
 
 }

@@ -1,11 +1,17 @@
 package net.cargal.littlecalc;
 
+import org.antlr.v4.runtime.Token;
+
 import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 
 public enum LVComparableOp {
     LT, LE, GT, GE;
 
-    static LVComparableOp fromToken(int tokenType) {
+    public static LVComparableOp fromToken(Token token) {
+        return fromTokenType(token.getType());
+    }
+
+    public static LVComparableOp fromTokenType(int tokenType) {
         switch (tokenType) {
             case LittleCalcLexer.LT:
                 return LT;

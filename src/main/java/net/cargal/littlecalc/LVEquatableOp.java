@@ -7,7 +7,11 @@ import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 public enum LVEquatableOp {
     EQ, NE;
 
-    static LVEquatableOp fromToken(int tokenType) {
+    public static LVEquatableOp fromToken(Token token) {
+        return fromToken(token.getType());
+    }
+
+    public static LVEquatableOp fromToken(int tokenType) {
         switch (tokenType) {
             case LittleCalcLexer.EQ:
                 return EQ;

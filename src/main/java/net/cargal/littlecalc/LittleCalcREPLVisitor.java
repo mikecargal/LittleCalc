@@ -14,8 +14,7 @@ public class LittleCalcREPLVisitor extends LittleCalcInterpVisitor {
 
     @Override
     public Void visitReplExpr(ReplExprContext ctx) {
-        super.visitReplExpr(ctx);
-        System.out.println(stack.pop());
+        System.out.println(exprVisitor.visit(ctx.expr()));
         return null;
     }
 
@@ -31,10 +30,6 @@ public class LittleCalcREPLVisitor extends LittleCalcInterpVisitor {
             tracing = getVar(cmd).bool();
             System.out.println("Tracing " + (tracing ? "On" : "Off"));
             parser.setTrace(getVar(cmd).bool());
-        }
-        if ("debug".equalsIgnoreCase(cmd)) {
-            debugging = getVar(cmd).bool();
-            System.out.println("debug " + (debugging ? "On" : "Off"));
         }
     }
 
