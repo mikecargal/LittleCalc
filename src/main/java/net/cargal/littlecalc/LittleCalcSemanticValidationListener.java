@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -34,7 +35,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     @Override
     public void exitIDExpr(LittleCalcParser.IDExprContext ctx) {
         var idVal = variables.get(ctx.ID().getText());
-        assertion(idVal != null, ctx.ID().getText() + " has not been assigned a value", ctx);
+        assertion(idVal != null, () -> ctx.ID().getText() + " has not been assigned a value", ctx);
         if (idVal == null) {
             typeStack.push(LVUnknownType.INSTANCE);
         } else {
@@ -114,7 +115,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
         var cond = typeStack.pop();
 
         assertion(tType.equals(fType), //
-                "true and false branches must share the same type (" + tType + "," + fType + ")", //
+                () -> "true and false branches must share the same type (" + tType + "," + fType + ")", //
                 ctx);
         assertBooleanType(cond, ctx.cond);
         typeStack.push(tType);
@@ -149,17 +150,18 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     }
 
     private void assertNumberType(LVType type, ParserRuleContext ctx) {
-        assertion(type instanceof LVNumberType, ctx.getText() + " is not numeric", ctx);
+        assertion(type instanceof LVNumberType, () -> ctx.getText() + " is not numeric", ctx);
     }
 
     private void assertBooleanType(LVType type, ParserRuleContext ctx) {
-        assertion(type instanceof LVBooleanType, ctx.getText() + " is not boolean", ctx);
+        assertion(type instanceof LVBooleanType, () -> ctx.getText() + " is not boolean", ctx);
     }
 
-    private void assertion(boolean condition, String message, ParserRuleContext ctx) {
+    private void assertion(boolean condition, Supplier<String> messageSupplier, ParserRuleContext ctx) {
         if (!condition) {
             Token tk = ctx.getStart();
-            var msg = LittleCalcRuntimeException.message(message, tk.getLine(), tk.getCharPositionInLine());
+            var msg = LittleCalcRuntimeException.message(messageSupplier.get(), tk.getLine(),
+                    tk.getCharPositionInLine());
             System.out.println(msg);
             errorMessages.add(msg);
         }

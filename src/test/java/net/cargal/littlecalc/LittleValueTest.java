@@ -325,8 +325,6 @@ class LittleValueTest {
 
     @Test
     void testBoolComparesToOther() {
-        var res = lvA.evalEquality(LVEquatableOp.EQ, lvTrue);
-        System.out.println(res);
         assertFalse(lvA.evalEquality(LVEquatableOp.EQ, lvTrue));
     }
 

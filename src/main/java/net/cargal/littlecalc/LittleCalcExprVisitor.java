@@ -1,5 +1,7 @@
 package net.cargal.littlecalc;
 
+import java.util.function.Supplier;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -35,7 +37,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
     @Override
     public LittleValue visitIDExpr(IDExprContext ctx) {
         LittleValue idVal = variables.get(ctx.ID().getText());
-        assertion(idVal != null, ctx.ID().getText() + " has not been assigned a value", ctx);
+        assertion(idVal != null, () -> ctx.ID().getText() + " has not been assigned a value", ctx);
         return idVal;
     }
 
@@ -112,10 +114,10 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
         return LittleValue.stringValue(stringFromToken(ctx.STRING()), ctx);
     }
 
-    private void assertion(boolean condition, String message, ParserRuleContext ctx) {
+    private void assertion(boolean condition, Supplier<String> messageSupplier, ParserRuleContext ctx) {
         if (!condition) {
             Token tk = ctx.getStart();
-            throw new LittleCalcRuntimeException(message, tk.getLine(), tk.getCharPositionInLine());
+            throw new LittleCalcRuntimeException(messageSupplier.get(), tk.getLine(), tk.getCharPositionInLine());
         }
     }
 
