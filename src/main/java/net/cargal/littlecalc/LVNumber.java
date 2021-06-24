@@ -6,7 +6,7 @@ public class LVNumber extends LittleValue {
     private Double value;
 
     public LVNumber(Double value, int line, int column) {
-        super(line,column);
+        super(line, column);
         this.value = value;
     }
 
@@ -26,8 +26,8 @@ public class LVNumber extends LittleValue {
     }
 
     @Override
-    public String type() {
-        return "NUMBER";
+    public LVType type() {
+        return LVNumberType.INSTANCE;
     }
 
     @Override

@@ -2,6 +2,8 @@ package net.cargal.littlecalc;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
+import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
+
 public class LVBoolean extends LittleValue {
     private Boolean value;
 
@@ -26,13 +28,19 @@ public class LVBoolean extends LittleValue {
     }
 
     @Override
-    public String type() {
-        return "BOOLEAN";
+    public LVType type() {
+        return LVBooleanType.INSTANCE;
     }
 
     @Override
     public int compareTo(LittleValue o) {
         return 1; //
+    }
+
+    @Override
+    public boolean evalCompare(LVComparableOp op, LittleValue rhs) {
+        throw new LittleCalcRuntimeException(
+                "Comparison operator ('" + op.getText() + "') is not valid for BOOLEAN values", line, column);
     }
 
     @Override

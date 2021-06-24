@@ -26,8 +26,8 @@ public class LVString extends LittleValue {
     }
 
     @Override
-    public String type() {
-        return "STRING";
+    public LVType type() {
+        return LVStringType.INSTANCE;
     }
 
     @Override

@@ -7,13 +7,12 @@ public class LVBooleanType extends LVType {
     }
 
     @Override
-    boolean canEquateTo(LVType other) {
-        return other instanceof LVBooleanType;
-    }
-
-    @Override
     boolean canCompareTo(LVType other) {
         return false;
     }
 
+    @Override
+    public String toString() {
+        return "BOOLEAN";
+    }
 }

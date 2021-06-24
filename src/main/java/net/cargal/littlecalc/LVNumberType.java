@@ -7,13 +7,12 @@ public class LVNumberType extends LVType {
     }
 
     @Override
-    boolean canEquateTo(LVType other) {
-        return other instanceof LVNumberType;
-    }
-
-    @Override
     boolean canCompareTo(LVType other) {
         return other instanceof LVNumberType;
     }
 
+    @Override
+    public String toString() {
+        return "NUMBER";
+    }
 }

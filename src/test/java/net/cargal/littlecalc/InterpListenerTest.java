@@ -3,7 +3,6 @@ package net.cargal.littlecalc;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Function;
@@ -24,6 +23,7 @@ public class InterpListenerTest {
     private LittleReplErrorListener errListener;
     private String capturedOutput;
     private LittleCalcParser parser;
+    private LittleCalcInterpVisitor visitor;
 
     private void interpret(Function<LittleCalcParser, ParserRuleContext> parseRule, String source) {
         var charStream = CharStreams.fromString(source);
@@ -31,15 +31,18 @@ public class InterpListenerTest {
         var tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
         listener = new LittleCalcSemanticValidationListener();
+        visitor = new LittleCalcInterpVisitor();
         parser.removeErrorListeners();
         errListener = new LittleReplErrorListener();
         parser.addErrorListener(errListener);
         try {
             capturedOutput = tapSystemErrAndOutNormalized(() -> {
                 var pt = parseRule.apply(parser);
-                if ((!errListener.incompleteInput()) && //
-                (parser.getNumberOfSyntaxErrors() == 0)) {
+                if ((parser.getNumberOfSyntaxErrors() == 0)) {
                     ParseTreeWalker.DEFAULT.walk(listener, pt);
+                    if (!listener.hasErrors()) {
+                        visitor.visit(pt);
+                    }
                 }
             });
         } catch (LittleCalcRuntimeException ex) {
@@ -53,7 +56,7 @@ public class InterpListenerTest {
     public void testNumberAssignment() {
         interpret(LittleCalcParser::replIn, "a=1.0");
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(1.0, listener.getVar("a").number());
+        assertEquals(1.0, visitor.getVar("a").number());
     }
 
     @Test
@@ -64,9 +67,9 @@ public class InterpListenerTest {
                 c = 3 < 4
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertTrue(listener.getVar("a").bool());
-        assertFalse(listener.getVar("b").bool());
-        assertTrue(listener.getVar("c").bool());
+        assertTrue(visitor.getVar("a").bool());
+        assertFalse(visitor.getVar("b").bool());
+        assertTrue(visitor.getVar("c").bool());
     }
 
     @Test
@@ -76,8 +79,8 @@ public class InterpListenerTest {
                 b="Chris"
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals("Mike", listener.getVar("a").string());
-        assertEquals("Chris", listener.getVar("b").string());
+        assertEquals("Mike", visitor.getVar("a").string());
+        assertEquals("Chris", visitor.getVar("b").string());
     }
 
     @Test
@@ -88,9 +91,9 @@ public class InterpListenerTest {
                 c=9-8+7
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(17.0, listener.getVar("a").number());
-        assertEquals(1.0, listener.getVar("b").number());
-        assertEquals(8.0, listener.getVar("c").number());
+        assertEquals(17.0, visitor.getVar("a").number());
+        assertEquals(1.0, visitor.getVar("b").number());
+        assertEquals(8.0, visitor.getVar("c").number());
     }
 
     @Test
@@ -101,9 +104,9 @@ public class InterpListenerTest {
                 c=9/3*7
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(72.0, listener.getVar("a").number());
-        assertEquals(3.0, listener.getVar("b").number());
-        assertEquals(21.0, listener.getVar("c").number());
+        assertEquals(72.0, visitor.getVar("a").number());
+        assertEquals(3.0, visitor.getVar("b").number());
+        assertEquals(21.0, visitor.getVar("c").number());
     }
 
     @Test
@@ -114,9 +117,9 @@ public class InterpListenerTest {
                 c=2^4^0.5
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(4.0, listener.getVar("a").number());
-        assertEquals(5.0, listener.getVar("b").number());
-        assertEquals(4.0, listener.getVar("c").number());
+        assertEquals(4.0, visitor.getVar("a").number());
+        assertEquals(5.0, visitor.getVar("b").number());
+        assertEquals(4.0, visitor.getVar("c").number());
     }
 
     @Test
@@ -127,18 +130,19 @@ public class InterpListenerTest {
                 c= 2<3 ? "yes" : "no"
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(2.0, listener.getVar("a").number());
-        assertEquals(3.0, listener.getVar("b").number());
-        assertEquals("yes", listener.getVar("c").string());
+        assertEquals(2.0, visitor.getVar("a").number());
+        assertEquals(3.0, visitor.getVar("b").number());
+        assertEquals("yes", visitor.getVar("c").string());
     }
 
-    @Test
-    public void testErrorAtEOF() {
-        interpret(LittleCalcParser::replIn, """
-                2 + 3 * 4 ^
-                """);
-        assertTrue(errListener.incompleteInput());
-    }
+    // @Disabled("Move to REPL unit testing")
+    // @Test
+    // public void testErrorAtEOF() {
+    // interpret(LittleCalcParser::replIn, """
+    // 2 + 3 * 4 ^
+    // """);
+    // assertTrue(errListener.incompleteInput());
+    // }
 
     @Test
     @Disabled("Move this over to unit testing for REPLListener")
@@ -180,13 +184,10 @@ public class InterpListenerTest {
 
     @Test
     public void testNoValue() {
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            interpret(LittleCalcParser::stmts, """
-                    a = b
-                    """);
-        });
-
-        assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage());
+        interpret(LittleCalcParser::stmts, """
+                a = b
+                """);
+        assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
     }
 
     @Test
@@ -198,10 +199,10 @@ public class InterpListenerTest {
                 d = false && false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertFalse(listener.getVar("a").bool());
-        assertFalse(listener.getVar("b").bool());
-        assertTrue(listener.getVar("c").bool());
-        assertFalse(listener.getVar("d").bool());
+        assertFalse(visitor.getVar("a").bool());
+        assertFalse(visitor.getVar("b").bool());
+        assertTrue(visitor.getVar("c").bool());
+        assertFalse(visitor.getVar("d").bool());
     }
 
     @Test
@@ -213,10 +214,10 @@ public class InterpListenerTest {
                 d = false || false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertTrue(listener.getVar("a").bool());
-        assertTrue(listener.getVar("b").bool());
-        assertTrue(listener.getVar("c").bool());
-        assertFalse(listener.getVar("d").bool());
+        assertTrue(visitor.getVar("a").bool());
+        assertTrue(visitor.getVar("b").bool());
+        assertTrue(visitor.getVar("c").bool());
+        assertFalse(visitor.getVar("d").bool());
     }
 
     @Test
@@ -226,8 +227,8 @@ public class InterpListenerTest {
                 b= !false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertFalse(listener.getVar("a").bool());
-        assertTrue(listener.getVar("b").bool());
+        assertFalse(visitor.getVar("a").bool());
+        assertTrue(visitor.getVar("b").bool());
 
     }
 

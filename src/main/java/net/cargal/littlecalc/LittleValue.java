@@ -1,5 +1,7 @@
 package net.cargal.littlecalc;
 
+import java.util.function.Supplier;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
@@ -7,8 +9,8 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public abstract class LittleValue implements Comparable<LittleValue> {
 
-    private int line;
-    private int column;
+    protected int line;
+    protected int column;
 
     public int getLine() {
         return line;
@@ -76,13 +78,14 @@ public abstract class LittleValue implements Comparable<LittleValue> {
         throw new LittleCalcRuntimeException("value is not a String (" + getValueObject() + ")", line, column);
     }
 
-    public abstract String type();
+    public abstract LVType type();
 
     public String toString() {
         return getValueObject().toString();
     }
 
     public boolean evalCompare(LVComparableOp op, LittleValue rhs) {
+        assertion(canCompareTo(rhs), () -> "Cannot compare " + this.type() + " to " + rhs.type());
         return switch (op) {
             case LT:
                 yield compareTo(rhs) < 0;
@@ -96,13 +99,17 @@ public abstract class LittleValue implements Comparable<LittleValue> {
     }
 
     public boolean evalEquality(LVEquatableOp op, LittleValue rhs) {
-        return (op == LVEquatableOp.EQ) ? equals(rhs) : !equals(rhs);
+        return ((op == LVEquatableOp.EQ) ? equals(rhs) : !equals(rhs));
     }
 
-    // private void assertion(boolean condition, String message) {
-    // if (!condition) {
-    // throw new LittleCalcRuntimeException(message, line, column);
-    // }
-    // }
+    private void assertion(boolean condition, Supplier<String> messageSupplier) {
+        if (!condition) {
+            throw new LittleCalcRuntimeException(messageSupplier.get(), line, column);
+        }
+    }
+
+    private boolean canCompareTo(LittleValue other) {
+        return this.type().canCompareTo(other.type());
+    }
 
 }

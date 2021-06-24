@@ -5,7 +5,17 @@ import org.antlr.v4.runtime.Token;
 import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 
 public enum LVComparableOp {
-    LT, LE, GT, GE;
+    LT("<"), LE("<="), GT(">"), GE(">=");
+
+    private String text;
+
+    LVComparableOp(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
 
     public static LVComparableOp fromToken(Token token) {
         return fromTokenType(token.getType());
@@ -22,7 +32,7 @@ public enum LVComparableOp {
             case LittleCalcLexer.GE:
                 return GE;
             default:
-                throw new LittleCalcImplementationException("invalid Comparable Op (" + tokenType + ")");
+                throw new LittleCalcImplementationException("Invalid Comparable Op (" + tokenType + ")");
         }
     }
 }

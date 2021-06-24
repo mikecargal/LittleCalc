@@ -26,8 +26,8 @@ public class LittleReplErrorListener extends BaseErrorListener {
         errorAtEOF = false;
     }
 
-    public boolean incompleteInput() {
-        return errorAtEOF ;
+    public boolean completeInput() {
+        return !errorAtEOF ;
     }
 
 }

@@ -7,13 +7,13 @@ public class LVStringType extends LVType {
     }
 
     @Override
-    boolean canEquateTo(LVType other) {
+    boolean canCompareTo(LVType other) {
         return other instanceof LVStringType;
     }
 
     @Override
-    boolean canCompareTo(LVType other) {
-        return other instanceof LVStringType;
+    public String toString() {
+        return "STRING";
     }
 
 }

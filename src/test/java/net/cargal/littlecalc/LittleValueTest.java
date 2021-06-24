@@ -1,5 +1,6 @@
 package net.cargal.littlecalc;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -11,6 +12,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 class LittleValueTest {
@@ -131,39 +133,39 @@ class LittleValueTest {
 
     @Test
     void testNumberComparesLT() {
-        assertTrue(lv1.evalCompare(LittleCalcLexer.LT, lv2));
-        assertFalse(lv2.evalCompare(LittleCalcLexer.LT, lv1));
+        assertTrue(lv1.evalCompare(LVComparableOp.LT, lv2));
+        assertFalse(lv2.evalCompare(LVComparableOp.LT, lv1));
     }
 
     @Test
     void testNumberComparesLE() {
-        assertTrue(lv1.evalCompare(LittleCalcLexer.LE, lv2));
-        assertTrue(lv2.evalCompare(LittleCalcLexer.LE, lv2Dup));
+        assertTrue(lv1.evalCompare(LVComparableOp.LE, lv2));
+        assertTrue(lv2.evalCompare(LVComparableOp.LE, lv2Dup));
     }
 
     @Test
     void testNumberComparesEQ() {
-        assertTrue(lv2.evalCompare(LittleCalcLexer.EQ, lv2Dup));
-        assertFalse(lv3.evalCompare(LittleCalcLexer.EQ, lv2));
+        assertTrue(lv2.evalEquality(LVEquatableOp.EQ, lv2Dup));
+        assertFalse(lv3.evalEquality(LVEquatableOp.EQ, lv2));
     }
 
     @Test
     void testNumberComparesNE() {
-        assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lv2));
-        assertFalse(lv2.evalCompare(LittleCalcLexer.NE, lv2Dup));
+        assertTrue(lv1.evalEquality(LVEquatableOp.NE, lv2));
+        assertFalse(lv2.evalEquality(LVEquatableOp.NE, lv2Dup));
     }
 
     @Test
     void testNumberComparesGE() {
-        assertTrue(lv3.evalCompare(LittleCalcLexer.GE, lv2));
-        assertTrue(lv2.evalCompare(LittleCalcLexer.GE, lv2Dup));
-        assertFalse(lv1.evalCompare(LittleCalcLexer.GE, lv2));
+        assertTrue(lv3.evalCompare(LVComparableOp.GE, lv2));
+        assertTrue(lv2.evalCompare(LVComparableOp.GE, lv2Dup));
+        assertFalse(lv1.evalCompare(LVComparableOp.GE, lv2));
     }
 
     @Test
     void testNumberComparesGT() {
-        assertTrue(lv3.evalCompare(LittleCalcLexer.GT, lv2));
-        assertFalse(lv2.evalCompare(LittleCalcLexer.GT, lv2Dup));
+        assertTrue(lv3.evalCompare(LVComparableOp.GT, lv2));
+        assertFalse(lv2.evalCompare(LVComparableOp.GT, lv2Dup));
     }
 
     @Test
@@ -183,13 +185,13 @@ class LittleValueTest {
     @Test
     void testNumberComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.LT, lv1);
+            lvA.evalCompare(LVComparableOp.LT, lv1);
         });
 
         assertEquals("line:5 col:21 -- Cannot compare STRING to NUMBER", ex.getMessage());
 
         ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.LT, lvTrue);
+            lvA.evalCompare(LVComparableOp.LT, lvTrue);
         });
 
         assertEquals("line:5 col:21 -- Cannot compare STRING to BOOLEAN", ex.getMessage());
@@ -197,40 +199,40 @@ class LittleValueTest {
 
     @Test
     void testStringComparesLT() {
-        assertTrue(lvA.evalCompare(LittleCalcLexer.LT, lvB));
-        assertFalse(lvB.evalCompare(LittleCalcLexer.LT, lvA));
+        assertTrue(lvA.evalCompare(LVComparableOp.LT, lvB));
+        assertFalse(lvB.evalCompare(LVComparableOp.LT, lvA));
     }
 
     @Test
     void testStringComparesLE() {
-        assertTrue(lvA.evalCompare(LittleCalcLexer.LE, lvB));
-        assertTrue(lvB.evalCompare(LittleCalcLexer.LE, lvBDup));
-        assertFalse(lvC.evalCompare(LittleCalcLexer.LE, lvB));
+        assertTrue(lvA.evalCompare(LVComparableOp.LE, lvB));
+        assertTrue(lvB.evalCompare(LVComparableOp.LE, lvBDup));
+        assertFalse(lvC.evalCompare(LVComparableOp.LE, lvB));
     }
 
     @Test
     void testStringComparesEQ() {
-        assertTrue(lvB.evalCompare(LittleCalcLexer.EQ, lvBDup));
-        assertFalse(lvC.evalCompare(LittleCalcLexer.EQ, lvB));
+        assertTrue(lvB.evalEquality(LVEquatableOp.EQ, lvBDup));
+        assertFalse(lvC.evalEquality(LVEquatableOp.EQ, lvB));
     }
 
     @Test
     void testStringComparesNE() {
-        assertTrue(lvA.evalCompare(LittleCalcLexer.NE, lvB));
-        assertFalse(lvB.evalCompare(LittleCalcLexer.NE, lvBDup));
+        assertTrue(lvA.evalEquality(LVEquatableOp.NE, lvB));
+        assertFalse(lvB.evalEquality(LVEquatableOp.NE, lvBDup));
     }
 
     @Test
     void testStringComparesGE() {
-        assertTrue(lvC.evalCompare(LittleCalcLexer.GE, lvB));
-        assertTrue(lvB.evalCompare(LittleCalcLexer.GE, lvBDup));
-        assertFalse(lvA.evalCompare(LittleCalcLexer.GE, lvB));
+        assertTrue(lvC.evalCompare(LVComparableOp.GE, lvB));
+        assertTrue(lvB.evalCompare(LVComparableOp.GE, lvBDup));
+        assertFalse(lvA.evalCompare(LVComparableOp.GE, lvB));
     }
 
     @Test
     void testStringComparesGT() {
-        assertTrue(lvC.evalCompare(LittleCalcLexer.GT, lvB));
-        assertFalse(lvB.evalCompare(LittleCalcLexer.GT, lvBDup));
+        assertTrue(lvC.evalCompare(LVComparableOp.GT, lvB));
+        assertFalse(lvB.evalCompare(LVComparableOp.GT, lvBDup));
     }
 
     @Test
@@ -249,13 +251,13 @@ class LittleValueTest {
     @Test
     void testStringComparesToOther() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.LT, lvTrue);
+            lvA.evalCompare(LVComparableOp.LT, lvTrue);
         });
 
         assertEquals("line:5 col:21 -- Cannot compare STRING to BOOLEAN", ex.getMessage());
 
         ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lvA.evalCompare(LittleCalcLexer.LT, lv1);
+            lvA.evalCompare(LVComparableOp.LT, lv1);
         });
 
         assertEquals("line:5 col:21 -- Cannot compare STRING to NUMBER", ex.getMessage());
@@ -263,23 +265,23 @@ class LittleValueTest {
 
     @Test
     void testBoolComparesEQ() {
-        assertTrue(lvFalse.evalCompare(LittleCalcLexer.EQ, lvFalseDup));
-        assertTrue(lvTrue.evalCompare(LittleCalcLexer.EQ, lvTrueDup));
-        assertFalse(lvTrue.evalCompare(LittleCalcLexer.EQ, lvFalse));
+        assertTrue(lvFalse.evalEquality(LVEquatableOp.EQ, lvFalseDup));
+        assertTrue(lvTrue.evalEquality(LVEquatableOp.EQ, lvTrueDup));
+        assertFalse(lvTrue.evalEquality(LVEquatableOp.EQ, lvFalse));
     }
 
     @Test
     void testBoolComparesNE() {
-        assertTrue(lvTrue.evalCompare(LittleCalcLexer.NE, lvFalse));
-        assertTrue(lvFalse.evalCompare(LittleCalcLexer.NE, lvTrue));
-        assertFalse(lvTrue.evalCompare(LittleCalcLexer.NE, lvTrueDup));
-        assertFalse(lvFalse.evalCompare(LittleCalcLexer.NE, lvFalseDup));
+        assertTrue(lvTrue.evalEquality(LVEquatableOp.NE, lvFalse));
+        assertTrue(lvFalse.evalEquality(LVEquatableOp.NE, lvTrue));
+        assertFalse(lvTrue.evalEquality(LVEquatableOp.NE, lvTrueDup));
+        assertFalse(lvFalse.evalEquality(LVEquatableOp.NE, lvFalseDup));
     }
 
     @Test
     void testBoolFailsLT() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            assertTrue(lvTrue.evalCompare(LittleCalcLexer.LT, lvFalse));
+            assertTrue(lvTrue.evalCompare(LVComparableOp.LT, lvFalse));
         });
         assertEquals("line:5 col:21 -- Comparison operator ('<') is not valid for BOOLEAN values", ex.getMessage());
     }
@@ -287,15 +289,15 @@ class LittleValueTest {
     @Test
     void testBoolFailsLE() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            assertTrue(lvTrue.evalCompare(LittleCalcLexer.LE, lvFalse));
+            assertTrue(lvTrue.evalCompare(LVComparableOp.LE, lvFalse));
         });
         assertEquals("line:5 col:21 -- Comparison operator ('<=') is not valid for BOOLEAN values", ex.getMessage());
     }
 
     @Test
-    void testBoolFailsGE() {
+    void testBoolFailsGE() throws Exception {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            assertTrue(lvTrue.evalCompare(LittleCalcLexer.GE, lvFalse));
+            lvTrue.evalCompare(LVComparableOp.GE, lvFalse);
         });
         assertEquals("line:5 col:21 -- Comparison operator ('>=') is not valid for BOOLEAN values", ex.getMessage());
     }
@@ -303,7 +305,7 @@ class LittleValueTest {
     @Test
     void testBoolFailsGT() {
         LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            assertTrue(lvTrue.evalCompare(LittleCalcLexer.GT, lvFalse));
+            assertTrue(lvTrue.evalCompare(LVComparableOp.GT, lvFalse));
         });
         assertEquals("line:5 col:21 -- Comparison operator ('>') is not valid for BOOLEAN values", ex.getMessage());
     }
@@ -323,24 +325,34 @@ class LittleValueTest {
 
     @Test
     void testBoolComparesToOther() {
-        assertFalse(lvA.evalCompare(LittleCalcLexer.EQ, lvTrue));
+        var res = lvA.evalEquality(LVEquatableOp.EQ, lvTrue);
+        System.out.println(res);
+        assertFalse(lvA.evalEquality(LVEquatableOp.EQ, lvTrue));
     }
 
     @Test
     void testBadCompareOp() {
-        var lv1 = LittleValue.numberValue(1.0, mockContext);
-        var lv2 = LittleValue.numberValue(2.0, mockContext);
-        LittleCalcRuntimeException ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            lv1.evalCompare(LittleCalcLexer.COMMENT, lv2);
+        var ex = assertThrows(LittleCalcImplementationException.class, () -> {
+            LVComparableOp.fromTokenType(LittleCalcLexer.ADD);
         });
-        assertEquals("line:5 col:21 -- Comparison operator (COMMENT) is not valid for NUMBER values", ex.getMessage());
+        assertEquals("Invalid Comparable Op (25) (this is an indication of an implementation error, not user error)",
+                ex.getMessage());
+    }
+
+    @Test
+    void testBadEquatableOp() {
+        var ex = assertThrows(LittleCalcImplementationException.class, () -> {
+            LVEquatableOp.fromTokenType(LittleCalcLexer.ADD);
+        });
+        assertEquals("Invalid Equatable Op (25) (this is an indication of an implementation error, not user error)",
+                ex.getMessage());
     }
 
     @Test
     void test_EQ_NE_AcrossTypes() {
-        assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvA));
-        assertTrue(lv1.evalCompare(LittleCalcLexer.NE, lvTrue));
-        assertFalse(lv1.evalCompare(LittleCalcLexer.EQ, lvA));
-        assertFalse(lv1.evalCompare(LittleCalcLexer.EQ, lvTrue));
+        assertTrue(lv1.evalEquality(LVEquatableOp.NE, lvA));
+        assertTrue(lv1.evalEquality(LVEquatableOp.NE, lvTrue));
+        assertFalse(lv1.evalEquality(LVEquatableOp.EQ, lvA));
+        assertFalse(lv1.evalEquality(LVEquatableOp.EQ, lvTrue));
     }
 }

@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import net.cargal.littlecalc.LittleCalcParser.AddSubExprContext;
 import net.cargal.littlecalc.LittleCalcParser.AndExprContext;
 import net.cargal.littlecalc.LittleCalcParser.CompareExprContext;
+import net.cargal.littlecalc.LittleCalcParser.EqualityExprContext;
 import net.cargal.littlecalc.LittleCalcParser.ExpExprContext;
 import net.cargal.littlecalc.LittleCalcParser.FalseExprContext;
 import net.cargal.littlecalc.LittleCalcParser.IDExprContext;
@@ -66,7 +67,13 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
 
     @Override
     public LittleValue visitCompareExpr(CompareExprContext ctx) {
-        var res = visit(ctx.lhs).evalCompare(LVComparableOp.fromToken(ctx.op), visit(ctx.lhs));
+        var res = visit(ctx.lhs).evalCompare(LVComparableOp.fromToken(ctx.op), visit(ctx.rhs));
+        return lvBool(res, ctx);
+    }
+
+    @Override
+    public LittleValue visitEqualityExpr(EqualityExprContext ctx) {
+        var res = visit(ctx.lhs).evalEquality(LVEquatableOp.fromToken(ctx.op), visit(ctx.rhs));
         return lvBool(res, ctx);
     }
 
