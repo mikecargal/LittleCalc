@@ -1,5 +1,7 @@
 package net.cargal.littlecalc;
 
+import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
+
 public class LVUnknownType extends LVType {
     public static final LVUnknownType INSTANCE = new LVUnknownType();
 
@@ -8,7 +10,8 @@ public class LVUnknownType extends LVType {
 
     @Override
     boolean canCompareTo(LVType other) {
-        return other instanceof LVNumberType;
+        throw new LittleCalcImplementationException(
+                "Should never even ask if an Unknown can be compared to another type");
     }
 
 }

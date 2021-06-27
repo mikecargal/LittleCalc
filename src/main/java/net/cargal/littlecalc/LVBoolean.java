@@ -1,7 +1,6 @@
 package net.cargal.littlecalc;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
+import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LVBoolean extends LittleValue {
@@ -11,6 +10,9 @@ public class LVBoolean extends LittleValue {
         super(line, column);
         this.value = value;
     }
+
+    public static final LVBoolean TRUE = new LVBoolean(true, 0, 0);
+    public static final LVBoolean FALSE = new LVBoolean(false, 0, 0);
 
     @Override
     protected Object getValueObject() {
@@ -34,7 +36,7 @@ public class LVBoolean extends LittleValue {
 
     @Override
     public int compareTo(LittleValue o) {
-        return 1; //
+        throw new LittleCalcImplementationException("Should not be attempting to compare a value to Boolean");
     }
 
     @Override

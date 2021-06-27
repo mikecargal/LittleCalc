@@ -3,6 +3,7 @@ package net.cargal.littlecalc;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Function;
@@ -20,28 +21,25 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 public class InterpListenerTest {
 
     private LittleCalcSemanticValidationListener listener;
-    private LittleReplErrorListener errListener;
     private String capturedOutput;
     private LittleCalcParser parser;
     private LittleCalcInterpVisitor visitor;
+    private ParserRuleContext parseTree;
 
     private void interpret(Function<LittleCalcParser, ParserRuleContext> parseRule, String source) {
         var charStream = CharStreams.fromString(source);
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
-        listener = new LittleCalcSemanticValidationListener();
-        visitor = new LittleCalcInterpVisitor();
-        parser.removeErrorListeners();
-        errListener = new LittleReplErrorListener();
-        parser.addErrorListener(errListener);
         try {
             capturedOutput = tapSystemErrAndOutNormalized(() -> {
-                var pt = parseRule.apply(parser);
+                parseTree = parseRule.apply(parser);
                 if ((parser.getNumberOfSyntaxErrors() == 0)) {
-                    ParseTreeWalker.DEFAULT.walk(listener, pt);
+                    listener = new LittleCalcSemanticValidationListener();
+                    ParseTreeWalker.DEFAULT.walk(listener, parseTree);
                     if (!listener.hasErrors()) {
-                        visitor.visit(pt);
+                        visitor = new LittleCalcInterpVisitor();
+                        visitor.visit(parseTree);
                     }
                 }
             });
@@ -53,86 +51,95 @@ public class InterpListenerTest {
     }
 
     @Test
-    public void testNumberAssignment() {
-        interpret(LittleCalcParser::replIn, "a=1.0");
+    void testNumberAssignment() {
+        interpret(LittleCalcParser::stmts, "a=1.0");
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(1.0, visitor.getVar("a").number());
+        assertEquals(1.0, visitor.getVar("a").get().number());
     }
 
     @Test
-    public void testBooleanAssignment() {
+    void testBooleanAssignment() {
         interpret(LittleCalcParser::stmts, """
                 a=true
                 b=false
                 c = 3 < 4
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertTrue(visitor.getVar("a").bool());
-        assertFalse(visitor.getVar("b").bool());
-        assertTrue(visitor.getVar("c").bool());
+        assertTrue(visitor.getVar("a").get().bool());
+        assertFalse(visitor.getVar("b").get().bool());
+        assertTrue(visitor.getVar("c").get().bool());
     }
 
     @Test
-    public void testStringAssignment() {
+    void testStringAssignment() {
         interpret(LittleCalcParser::stmts, """
                 a='Mike'
                 b="Chris"
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals("Mike", visitor.getVar("a").string());
-        assertEquals("Chris", visitor.getVar("b").string());
+        assertEquals("Mike", visitor.getVar("a").get().string());
+        assertEquals("Chris", visitor.getVar("b").get().string());
     }
 
     @Test
-    public void testAddSub() {
+    void testAddSub() {
         interpret(LittleCalcParser::stmts, """
                 a=8+9
                 b=9-8
                 c=9-8+7
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(17.0, visitor.getVar("a").number());
-        assertEquals(1.0, visitor.getVar("b").number());
-        assertEquals(8.0, visitor.getVar("c").number());
+        assertEquals(17.0, visitor.getVar("a").get().number());
+        assertEquals(1.0, visitor.getVar("b").get().number());
+        assertEquals(8.0, visitor.getVar("c").get().number());
     }
 
     @Test
-    public void testMulDiv() {
+    void testMulDiv() {
         interpret(LittleCalcParser::stmts, """
                 a=8*9
                 b=9/3
                 c=9/3*7
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(72.0, visitor.getVar("a").number());
-        assertEquals(3.0, visitor.getVar("b").number());
-        assertEquals(21.0, visitor.getVar("c").number());
+        assertEquals(72.0, visitor.getVar("a").get().number());
+        assertEquals(3.0, visitor.getVar("b").get().number());
+        assertEquals(21.0, visitor.getVar("c").get().number());
     }
 
     @Test
-    public void testExp() {
+    void testExp() {
         interpret(LittleCalcParser::stmts, """
                 a=2^2
                 b=25^0.5
                 c=2^4^0.5
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(4.0, visitor.getVar("a").number());
-        assertEquals(5.0, visitor.getVar("b").number());
-        assertEquals(4.0, visitor.getVar("c").number());
+        assertEquals(4.0, visitor.getVar("a").get().number());
+        assertEquals(5.0, visitor.getVar("b").get().number());
+        assertEquals(4.0, visitor.getVar("c").get().number());
     }
 
     @Test
-    public void testTernary() {
+    void testTernary() {
         interpret(LittleCalcParser::stmts, """
                 a= true ? 2 : 3
                 b= false ? 2 : 3
                 c= 2<3 ? "yes" : "no"
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(2.0, visitor.getVar("a").number());
-        assertEquals(3.0, visitor.getVar("b").number());
-        assertEquals("yes", visitor.getVar("c").string());
+        assertEquals(2.0, visitor.getVar("a").get().number());
+        assertEquals(3.0, visitor.getVar("b").get().number());
+        assertEquals("yes", visitor.getVar("c").get().string());
+    }
+
+    @Test
+    void testBadTernary() {
+        interpret(LittleCalcParser::stmts, """
+                a= true ? 2 : "3"
+                """);
+        assertEquals("line:1 col:4 -- true and false branches must share the same type (STRING,NUMBER)",
+                capturedOutput.trim());
     }
 
     // @Disabled("Move to REPL unit testing")
@@ -146,7 +153,7 @@ public class InterpListenerTest {
 
     @Test
     @Disabled("Move this over to unit testing for REPLListener")
-    public void testREPLExpr() {
+    void testREPLExpr() {
         interpret(LittleCalcParser::replIn, """
                 2 + 3
                 """);
@@ -155,7 +162,7 @@ public class InterpListenerTest {
     }
 
     @Test
-    public void testPrint() {
+    void testPrint() {
         interpret(LittleCalcParser::stmts, """
                 a = true
                 Print "The test worked = " a
@@ -166,7 +173,7 @@ public class InterpListenerTest {
     }
 
     @Test
-    public void testVars() {
+    void testVars() {
         interpret(LittleCalcParser::stmts, """
                 a = "Test"
                 b = 0.5
@@ -183,15 +190,34 @@ public class InterpListenerTest {
     }
 
     @Test
-    public void testNoValue() {
+    void testNoValue() throws Exception {
         interpret(LittleCalcParser::stmts, """
                 a = b
                 """);
         assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
+
+        var ex = assertThrows(LittleCalcRuntimeException.class, () -> {
+            new LittleCalcInterpVisitor().visit(parseTree);
+        });
+        assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage().trim());
     }
 
     @Test
-    public void testAnd() {
+    void testEquatlity() {
+        interpret(LittleCalcParser::stmts, """
+                a = 2 == 2
+                b = 2 != 2
+                c = 3 != 4
+                d = 3 == 4
+                """);
+        assertTrue(visitor.getVar("a").get().bool());
+        assertFalse(visitor.getVar("b").get().bool());
+        assertTrue(visitor.getVar("c").get().bool());
+        assertFalse(visitor.getVar("d").get().bool());
+    }
+
+    @Test
+    void testAnd() {
         interpret(LittleCalcParser::stmts, """
                 a= true && false
                 b= false && true
@@ -199,14 +225,14 @@ public class InterpListenerTest {
                 d = false && false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertFalse(visitor.getVar("a").bool());
-        assertFalse(visitor.getVar("b").bool());
-        assertTrue(visitor.getVar("c").bool());
-        assertFalse(visitor.getVar("d").bool());
+        assertFalse(visitor.getVar("a").get().bool());
+        assertFalse(visitor.getVar("b").get().bool());
+        assertTrue(visitor.getVar("c").get().bool());
+        assertFalse(visitor.getVar("d").get().bool());
     }
 
     @Test
-    public void testOr() {
+    void testOr() {
         interpret(LittleCalcParser::stmts, """
                 a= true || false
                 b= false || true
@@ -214,22 +240,37 @@ public class InterpListenerTest {
                 d = false || false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertTrue(visitor.getVar("a").bool());
-        assertTrue(visitor.getVar("b").bool());
-        assertTrue(visitor.getVar("c").bool());
-        assertFalse(visitor.getVar("d").bool());
+        assertTrue(visitor.getVar("a").get().bool());
+        assertTrue(visitor.getVar("b").get().bool());
+        assertTrue(visitor.getVar("c").get().bool());
+        assertFalse(visitor.getVar("d").get().bool());
     }
 
     @Test
-    public void TestNot() {
+    void TestNot() {
         interpret(LittleCalcParser::stmts, """
                 a= !true
                 b= !false
                 """);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertFalse(visitor.getVar("a").bool());
-        assertTrue(visitor.getVar("b").bool());
+        assertFalse(visitor.getVar("a").get().bool());
+        assertTrue(visitor.getVar("b").get().bool());
 
+    }
+
+    @Test
+    void TestParseError() {
+        interpret(LittleCalcParser::stmts, """
+                mike = 10
+                8 * 9 ^ / (mike / v)
+                """);
+        var expected = """
+                line 2:0 extraneous input '8' expecting {<EOF>, PRINT, 'vars', ID}
+                line 2:16 mismatched input '/' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', '^', '*', '/', '+', '-', '?', ID}
+                line 2:19 mismatched input ')' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', '^', '*', '/', '+', '-', '?', ID}
+                """;
+        assertEquals(3, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, capturedOutput);
     }
 
     // TODO: Unit tests to verify precedence

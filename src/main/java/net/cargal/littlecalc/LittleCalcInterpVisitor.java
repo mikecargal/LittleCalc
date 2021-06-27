@@ -1,5 +1,7 @@
 package net.cargal.littlecalc;
 
+import java.util.Optional;
+
 import org.antlr.v4.runtime.Parser;
 import org.tinylog.Logger;
 
@@ -8,7 +10,7 @@ import net.cargal.littlecalc.LittleCalcParser.PrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintVarsContext;
 
 public class LittleCalcInterpVisitor extends LittleCalcBaseVisitor<Void> {
-    protected SymbolTable variables = new SymbolTable();
+    protected SymbolTable<LittleValue> variables = new SymbolTable<>();
     protected LittleCalcExprVisitor exprVisitor;
     protected Parser parser;
 
@@ -42,10 +44,10 @@ public class LittleCalcInterpVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     public void dumpVariables() {
-        variables.keyStream().forEach(key -> System.out.println("\t" + key + " : " + variables.get(key)));
+        variables.keyStream().forEach(key -> System.out.println("\t" + key + " : " + variables.get(key).get()));
     }
 
-    public LittleValue getVar(String varID) {
+    public Optional<LittleValue> getVar(String varID) {
         return variables.get(varID);
     }
 

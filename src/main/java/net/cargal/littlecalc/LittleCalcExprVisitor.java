@@ -23,22 +23,23 @@ import net.cargal.littlecalc.LittleCalcParser.TrueExprContext;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
-    private SymbolTable variables;
+    private SymbolTable<LittleValue> variables;
 
-    public LittleCalcExprVisitor(SymbolTable variables) {
+    public LittleCalcExprVisitor(SymbolTable<LittleValue> variables) {
         this.variables = variables;
     }
 
-    @Override
-    protected LittleValue aggregateResult(LittleValue aggregate, LittleValue nextResult) {
-        return (nextResult != null) ? nextResult : aggregate;
-    }
+    // @Override
+    // protected LittleValue aggregateResult(LittleValue aggregate, LittleValue
+    // nextResult) {
+    // return (nextResult != null) ? nextResult : aggregate;
+    // }
 
     @Override
     public LittleValue visitIDExpr(IDExprContext ctx) {
-        LittleValue idVal = variables.get(ctx.ID().getText());
-        assertion(idVal != null, () -> ctx.ID().getText() + " has not been assigned a value", ctx);
-        return idVal;
+        var idVal = variables.get(ctx.ID().getText());
+        assertion(idVal.isPresent(), () -> ctx.ID().getText() + " has not been assigned a value", ctx);
+        return idVal.get();
     }
 
     @Override

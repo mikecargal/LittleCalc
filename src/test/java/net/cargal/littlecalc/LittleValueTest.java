@@ -50,17 +50,17 @@ class LittleValueTest {
         mockContext.start = token;
 
         lv1 = LittleValue.numberValue(D1_0, mockContext);
-        lv2 = LittleValue.numberValue(D2_0, mockContext);
-        lv2Dup = LittleValue.numberValue(D2_0, mockContext);
-        lv3 = LittleValue.numberValue(D3_0, mockContext);
+        lv2 = LittleValue.numberValue(D2_0, LINE, COLUMN);
+        lv2Dup = LittleValue.numberValue(D2_0,  LINE, COLUMN);
+        lv3 = LittleValue.numberValue(D3_0,  LINE, COLUMN);
         lvA = LittleValue.stringValue(AAA, mockContext);
-        lvB = LittleValue.stringValue(BBB, mockContext);
-        lvBDup = LittleValue.stringValue(BBB, mockContext);
-        lvC = LittleValue.stringValue(CCC, mockContext);
+        lvB = LittleValue.stringValue(BBB,  LINE, COLUMN);
+        lvBDup = LittleValue.stringValue(BBB,  LINE, COLUMN);
+        lvC = LittleValue.stringValue(CCC,  LINE, COLUMN);
         lvTrue = LittleValue.booleanValue(true, mockContext);
-        lvTrueDup = LittleValue.booleanValue(true, mockContext);
-        lvFalse = LittleValue.booleanValue(false, mockContext);
-        lvFalseDup = LittleValue.booleanValue(false, mockContext);
+        lvTrueDup = LittleValue.booleanValue(true,  LINE, COLUMN);
+        lvFalse = LittleValue.booleanValue(false,  LINE, COLUMN);
+        lvFalseDup = LittleValue.booleanValue(false,  LINE, COLUMN);
     }
 
     @Test
@@ -77,6 +77,13 @@ class LittleValueTest {
         });
         assertThrows(LittleCalcRuntimeException.class, () -> {
             lvA.number();
+        });
+    }
+
+    @Test
+    void unknownType() {
+        assertThrows(LittleCalcImplementationException.class, () -> {
+            LVUnknownType.INSTANCE.canCompareTo(LVNumberType.INSTANCE);
         });
     }
 
@@ -111,6 +118,12 @@ class LittleValueTest {
         });
         assertThrows(LittleCalcRuntimeException.class, () -> {
             lvTrue.number();
+        });
+        assertThrows(LittleCalcImplementationException.class, () -> {
+            lvTrue.type().canCompareTo(lvFalse.type());
+        });
+        assertThrows(LittleCalcImplementationException.class, () -> {
+            lvTrue.compareTo(lvFalse);
         });
     }
 

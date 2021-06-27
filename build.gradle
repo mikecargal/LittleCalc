@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'antlr'
     id 'jacoco'
+    id 'java'
 }
 
 repositories {
@@ -69,6 +70,10 @@ task(repl, dependsOn: 'classes', type: JavaExec) {
     standardInput = System.in
 }
 
+jacoco {
+    toolVersion = "0.8.7"
+}
+
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport // report is always generated after tests run
@@ -79,6 +84,29 @@ jacocoTestReport {
     reports {
         xml.enabled true
         csv.enabled false
-        html.destination layout.buildDirectory.dir('jacocoHtml').get().asFile
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+        afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it)
+            .filter({file -> !file.path.contains('LittleCalcLexer')})
+            .filter({file -> !file.path.contains('LittleCalcParser')})
+            .filter({file -> !file.path.contains('LittleCalcBaseListener')})
+            .filter({file -> !file.path.contains('LittleCalcListener')})
+            .filter({file -> !file.path.contains('LittleCalcVisitor')})
+            .filter({file -> !file.path.contains('LittleCalcBaseVisitor')})
+        }))
+    }
+
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            includes = ['net/cargal/*']
+            limit {
+                minimum = 0.85
+            }
+        }
     }
 }

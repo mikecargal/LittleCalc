@@ -1,10 +1,10 @@
 package net.cargal.littlecalc;
 
-import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
-public class LittleReplErrorListener extends BaseErrorListener {
+public class LittleReplErrorListener extends ConsoleErrorListener {
     private boolean errorAtEOF = false;
 
     @Override
@@ -27,7 +27,7 @@ public class LittleReplErrorListener extends BaseErrorListener {
     }
 
     public boolean completeInput() {
-        return !errorAtEOF ;
+        return !errorAtEOF;
     }
 
 }

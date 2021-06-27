@@ -1,5 +1,7 @@
 package net.cargal.littlecalc;
 
+import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
+
 public class LVBooleanType extends LVType {
     public static final LVBooleanType INSTANCE = new LVBooleanType();
 
@@ -8,7 +10,8 @@ public class LVBooleanType extends LVType {
 
     @Override
     boolean canCompareTo(LVType other) {
-        return false;
+        throw new LittleCalcImplementationException(
+                "Should never even ask if a Boolean can be compared to another type");
     }
 
     @Override
