@@ -1,7 +1,5 @@
 package net.cargal.littlecalc;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
 public class LVNumber extends LittleValue {
     private Double value;
 

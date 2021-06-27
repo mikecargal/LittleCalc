@@ -1,6 +1,5 @@
 package net.cargal.littlecalc;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
