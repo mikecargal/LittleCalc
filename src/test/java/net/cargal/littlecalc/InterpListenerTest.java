@@ -142,6 +142,40 @@ public class InterpListenerTest {
                 capturedOutput.trim());
     }
 
+    @Test
+    void testNotNumber() {
+        interpret(LittleCalcParser::stmts, """
+                a =  2 + "3"
+                """);
+        assertEquals("line:1 col:10 -- \"3\" is not numeric", capturedOutput.trim());
+    }
+
+    @Test
+    void testNotBoolean() {
+        interpret(LittleCalcParser::stmts, """
+                a = true && 3
+                """);
+        assertEquals("line:1 col:13 -- 3 is not boolean", capturedOutput.trim());
+    }
+
+    @Test
+    void testBadCompare() {
+        interpret(LittleCalcParser::stmts, """
+                a = 1 < "3"
+                """);
+        assertEquals("line:1 col:5 -- can not compare NUMBER to STRING", capturedOutput.trim());
+    }
+
+    @Test
+    void testreset() {
+        interpret(LittleCalcParser::stmts, """
+                a = 1 < "3"
+                """);
+        assertTrue(listener.hasErrors());
+        listener.reset();
+        assertFalse(listener.hasErrors());
+    }
+
     // @Disabled("Move to REPL unit testing")
     // @Test
     // public void testErrorAtEOF() {

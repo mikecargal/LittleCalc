@@ -58,7 +58,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
         var rhs = typeStack.pop();
         var lhs = typeStack.pop();
 
-        assert (lhs.canCompareTo(rhs));
+        assertion(lhs.canCompareTo(rhs), () -> "can not compare " + lhs + " to " + rhs, ctx);
         typeStack.push(LVBooleanType.INSTANCE);
     }
 

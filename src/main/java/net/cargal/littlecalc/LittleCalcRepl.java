@@ -1,6 +1,7 @@
 package net.cargal.littlecalc;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -17,15 +18,19 @@ public class LittleCalcRepl {
     private static final String CONTINUE_PROMPT = "| ";
     private static final String INPUT_CONTINUE_SUFFIX = "\\";
 
-    private static LittleCalcLexer lexer;
-    private static CommonTokenStream tokenStream;
-    private static LittleCalcParser parser;
-    private static LittleCalcREPLVisitor executionVisitor;
-    private static LittleReplErrorListener replErrListener;
-    private static LittleCalcSemanticValidationListener listener;
+    private LittleCalcLexer lexer;
+    private CommonTokenStream tokenStream;
+    private LittleCalcParser parser;
+    private LittleCalcREPLVisitor executionVisitor;
+    private LittleReplErrorListener replErrListener;
+    private LittleCalcSemanticValidationListener listener;
 
     public static void main(String... args) throws IOException {
-        var lineReader = getLineReader();
+        new LittleCalcRepl().run(System.in);
+    }
+
+    void run(InputStream inputStream) throws IOException {
+        var lineReader = getLineReader(inputStream);
         initParser();
         var parseString = "";
         while (true) {
@@ -37,19 +42,21 @@ public class LittleCalcRepl {
         System.out.println("Exiting...");
     }
 
-    private static LineReader getLineReader() throws IOException {
-        var terminal = TerminalBuilder.terminal();
+    LineReader getLineReader(InputStream inputStream) throws IOException {
+        var terminal = TerminalBuilder.builder() //
+                .streams(inputStream, System.out) //
+             //   .jna(true) //
+                .build();
         return LineReaderBuilder.builder() //
-                .terminal(terminal) //
-                .option(Option.DISABLE_EVENT_EXPANSION, true) //
+                .terminal(terminal).option(Option.DISABLE_EVENT_EXPANSION, true) //
                 .build();
     }
 
-    private static String getInput(LineReader lineReader, String existingSrc) {
+    String getInput(LineReader lineReader, String existingSrc) {
         return lineReader.readLine(existingSrc.isEmpty() ? INITIAL_PROMPT : CONTINUE_PROMPT);
     }
 
-    private static void initParser() {
+    private void initParser() {
         lexer = new LittleCalcLexer(CharStreams.fromString(""));
         tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
@@ -61,7 +68,7 @@ public class LittleCalcRepl {
         parser.addErrorListener(replErrListener);
     }
 
-    private static String process(String source) {
+    private String process(String source) {
         if (source.trim().endsWith(INPUT_CONTINUE_SUFFIX)) {
             return source.substring(0, source.lastIndexOf(INPUT_CONTINUE_SUFFIX));
         }
@@ -81,7 +88,7 @@ public class LittleCalcRepl {
         return result;
     }
 
-    private static ReplInContext parseInput(String source) {
+    private ReplInContext parseInput(String source) {
         lexer.setInputStream(CharStreams.fromString(source));
         tokenStream.setTokenSource(lexer);
         parser.setTokenStream(tokenStream);
