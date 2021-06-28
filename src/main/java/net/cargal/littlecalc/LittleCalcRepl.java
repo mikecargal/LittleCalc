@@ -21,7 +21,7 @@ public class LittleCalcRepl {
     private LittleCalcLexer lexer;
     private CommonTokenStream tokenStream;
     private LittleCalcParser parser;
-    private LittleCalcREPLVisitor executionVisitor;
+    private LittleCalcREPLVisitor replVisitor;
     private LittleReplErrorListener replErrListener;
     private LittleCalcSemanticValidationListener listener;
 
@@ -61,7 +61,7 @@ public class LittleCalcRepl {
         tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
         listener = new LittleCalcSemanticValidationListener();
-        executionVisitor = new LittleCalcREPLVisitor(parser);
+        replVisitor = new LittleCalcREPLVisitor(parser);
 
         replErrListener = new LittleReplErrorListener();
         parser.removeErrorListeners();
@@ -79,7 +79,7 @@ public class LittleCalcRepl {
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 ParseTreeWalker.DEFAULT.walk(listener, replTree);
                 if (!listener.hasErrors()) {
-                    executionVisitor.visit(replTree);
+                    replVisitor.visit(replTree);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class LittleCalcRepl {
         lexer.setInputStream(CharStreams.fromString(source));
         tokenStream.setTokenSource(lexer);
         parser.setTokenStream(tokenStream);
-        parser.setTrace(executionVisitor.isTracing());
+        parser.setTrace(replVisitor.isTracing());
         return parser.replIn();
     }
 
