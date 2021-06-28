@@ -39,7 +39,8 @@ public class REPLTest {
                 7 + 8
                 15.0
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
+
     }
 
     @Test
@@ -53,7 +54,8 @@ public class REPLTest {
                 x
                 10
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
+
     }
 
     @Test
@@ -72,7 +74,8 @@ public class REPLTest {
                 + 4
                 7
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
+
     }
 
     @Test
@@ -84,7 +87,7 @@ public class REPLTest {
                 8 * * 9
                 extraneous input '*' expecting
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
     }
 
     @Test
@@ -96,7 +99,7 @@ public class REPLTest {
                 8 * "test"
                 "test" is not numeric
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
     }
 
     @Test
@@ -124,7 +127,21 @@ public class REPLTest {
                 exit    replIn
                 Tracing Off
                 """;
-        verifyRun(prep(source, expected));
+        verifyRun(source, expected);
+    }
+
+    private InputStream inputStream(String inputString) {
+        return new ByteArrayInputStream(inputString.getBytes());
+    }
+
+    private void verifyRun(String source, String expected) throws Exception {
+        var pair = prep(source, expected);
+        var preppedSource = pair.a;
+        var preppedExpected = pair.b;
+        capturedOutput = tapSystemErrAndOutNormalized(() -> {
+            repl.run(inputStream(preppedSource));
+        });
+        assertMatchedOutput(preppedExpected);
     }
 
     private Pair<String, String> prep(String source, String expected) {
@@ -134,19 +151,6 @@ public class REPLTest {
                 Exiting...
                 """;
         return new Pair<>(resSource, resExpected);
-    }
-
-    private InputStream inputStream(String inputString) {
-        return new ByteArrayInputStream(inputString.getBytes());
-    }
-
-    private void verifyRun(Pair<String, String> pair) throws Exception {
-        var source = pair.a;
-        var expected = pair.b;
-        capturedOutput = tapSystemErrAndOutNormalized(() -> {
-            repl.run(inputStream(source));
-        });
-        assertMatchedOutput(expected);
     }
 
     private void assertMatchedOutput(String expected) {

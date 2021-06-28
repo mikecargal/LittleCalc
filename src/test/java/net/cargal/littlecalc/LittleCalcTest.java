@@ -5,11 +5,90 @@ package net.cargal.littlecalc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.antlr.v4.runtime.CharStreams;
+
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LittleCalcTest {
-    @Test void testAppHasAGreeting() {
-        var classUnderTest = new LittleCalc();
-        assertEquals(classUnderTest.getClass(),LittleCalc.class);
+    private LittleCalc lc;
+    private String capturedOutput;
+
+    @BeforeEach
+    void before() {
+        lc = new LittleCalc();
+    }
+
+    @Test
+    void testAssignAndPrint() throws Exception {
+        var source = """
+                x = 10
+                print x
+                """;
+        var expected = """
+                10
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testParseError() throws Exception {
+        var source = """
+                    x = 9 * + 4
+                """;
+
+        var expected = """
+                extraneous input '+'
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testSemanticError() throws Exception {
+        var source = """
+                    x = 9 * "nope"
+                """;
+
+        var expected = """
+                \"nope\" is not numeric
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testRuntimeError() throws Exception {
+        var source = """
+                    x = y
+                """;
+
+        var expected = """
+                y has not been assigned a value
+                """;
+        verifyRun(source, expected);
+    }
+
+    private void verifyRun(String source, String expected) throws Exception {
+        capturedOutput = tapSystemErrAndOutNormalized(() -> {
+            lc.run(CharStreams.fromString(source));
+        });
+        assertMatchedOutput(expected);
+    }
+
+    private void assertMatchedOutput(String expected) {
+        var expectedLines = expected.split("\n");
+        var outputLines = capturedOutput.split("[\n\r]+");
+
+        if (expectedLines.length != outputLines.length) {
+            System.out.println(expected);
+            System.out.println(capturedOutput);
+        }
+
+        for (int i = 0; i < expectedLines.length; i++) {
+            assertThat(outputLines[i], containsString(expectedLines[i]));
+        }
+        assertEquals(expectedLines.length, outputLines.length);
     }
 }

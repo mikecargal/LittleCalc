@@ -59,12 +59,6 @@ task(smokeTest, dependsOn: 'classes', type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task(interp, dependsOn: 'classes', type: JavaExec) {
-    main = 'net.cargal.littlecalc.LittleCalcInterp'
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in 
-}
-
 task(repl, dependsOn: 'classes', type: JavaExec) {
     main = 'net.cargal.littlecalc.LittleCalcRepl'
     classpath = sourceSets.main.runtimeClasspath
@@ -101,13 +95,3 @@ jacocoTestReport {
 
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            includes = ['net/cargal/*']
-            limit {
-                minimum = 0.85
-            }
-        }
-    }
-}

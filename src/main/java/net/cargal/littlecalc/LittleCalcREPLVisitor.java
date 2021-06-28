@@ -28,6 +28,7 @@ public class LittleCalcREPLVisitor extends LittleCalcInterpVisitor {
     private void processCommand(String cmd) {
         if ("trace".equalsIgnoreCase(cmd)) {
             tracing = getVar(cmd).orElse(LVBoolean.FALSE).bool();
+            // TODO: set up tracing TokenFactory
             System.out.println("Tracing " + (tracing ? "On" : "Off"));
             parser.setTrace(tracing);
         }

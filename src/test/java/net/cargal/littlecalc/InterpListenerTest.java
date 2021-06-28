@@ -13,7 +13,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
@@ -174,25 +173,6 @@ public class InterpListenerTest {
         assertTrue(listener.hasErrors());
         listener.reset();
         assertFalse(listener.hasErrors());
-    }
-
-    // @Disabled("Move to REPL unit testing")
-    // @Test
-    // public void testErrorAtEOF() {
-    // interpret(LittleCalcParser::replIn, """
-    // 2 + 3 * 4 ^
-    // """);
-    // assertTrue(errListener.incompleteInput());
-    // }
-
-    @Test
-    @Disabled("Move this over to unit testing for REPLListener")
-    void testREPLExpr() {
-        interpret(LittleCalcParser::replIn, """
-                2 + 3
-                """);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals("5.0", capturedOutput.trim());
     }
 
     @Test

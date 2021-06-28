@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch LittleCalc",
+            "request": "launch",
+            "mainClass": "net.cargal.littlecalc.LittleCalc",
+            "projectName": "LittleCalc"
+        },
+        {
+            "type": "java",
             "name": "Launch LittleCalcInterp",
             "request": "launch",
             "mainClass": "net.cargal.littlecalc.LittleCalcInterp",

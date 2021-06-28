@@ -2,15 +2,28 @@ package net.cargal.littlecalc;
 
 import java.io.IOException;
 
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class LittleCalc {
     public static void main(String... args) throws IOException {
-        var charStream = CharStreams.fromFileName("./little.ltl");
+        new LittleCalc().run(CharStreams.fromFileName("./little.ltl"));
+    }
+
+    public void run(CharStream charStream) {
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);
-        parser.stmts();
+        var listener = new LittleCalcSemanticValidationListener();
+
+        var stmts = parser.stmts();
+        if (parser.getNumberOfSyntaxErrors() == 0) {
+            ParseTreeWalker.DEFAULT.walk(listener, stmts);
+            if (!listener.hasErrors()) {
+                new LittleCalcInterpVisitor().visit(stmts);
+            }
+        }
     }
 }
