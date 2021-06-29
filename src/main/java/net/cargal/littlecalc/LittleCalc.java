@@ -22,7 +22,7 @@ public class LittleCalc {
         if (parser.getNumberOfSyntaxErrors() == 0) {
             ParseTreeWalker.DEFAULT.walk(listener, stmts);
             if (!listener.hasErrors()) {
-                new LittleCalcInterpVisitor().visit(stmts);
+                new LittleCalcExecutionVisitor().visit(stmts);
             }
         }
     }

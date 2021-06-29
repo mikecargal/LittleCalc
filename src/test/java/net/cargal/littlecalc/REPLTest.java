@@ -1,16 +1,16 @@
 package net.cargal.littlecalc;
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
-import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 
 import org.antlr.v4.runtime.misc.Pair;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,11 @@ public class REPLTest {
     }
 
     @Test
-    void testLineReader() throws IOException {
-        var lineReader = repl.getLineReader(inputStream("quit\n"));
-        assertEquals("quit", lineReader.readLine());
+    void testLineReader() throws Exception {
+        tapSystemErrAndOutNormalized(() -> {
+            var lineReader = repl.getLineReader(getTerminal("quit\n"));
+            assertEquals("quit", lineReader.readLine());
+        });
     }
 
     @Test
@@ -103,19 +105,17 @@ public class REPLTest {
     }
 
     @Test
-    void testTracing() throws Exception {
+    void testParserTracing() throws Exception {
         var source = """
-                trace = true
-                trace = false
+                parserTracing = true
+                parserTracing = false
+                9
                 """;
-        // TODO: why do we see "lIn" instead of "enter replIn"
-        // Must be something to do with catpuring output, get correct results in actual
-        // REPL
         var expected = """
-                trace = true
-                Tracing On
-                trace = false
-                lIn
+                parserTracing = true
+                Parser Tracing On
+                parserTracing = false
+                replIn
                 enter   stmt
                 consume
                 consume
@@ -125,13 +125,73 @@ public class REPLTest {
                 exit    stmt
                 consume
                 exit    replIn
-                Tracing Off
+                Parser Tracing Off
+                9
+                9.0
                 """;
         verifyRun(source, expected);
     }
 
-    private InputStream inputStream(String inputString) {
-        return new ByteArrayInputStream(inputString.getBytes());
+    @Test
+    void testLexerTracing() throws Exception {
+        var source = """
+                lexerTracing = true
+                lexerTracing = false
+                9
+                """;
+        var expected = """
+                lexerTracing = true
+                Lexer Tracing On
+                lexerTracing = false
+                ID
+                '='
+                'false'
+                EOF
+                Lexer Tracing Off
+                9
+                9.0
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testFullTracing() throws Exception {
+        var source = """
+                fullTracing = true
+                fullTracing = false
+                9
+                """;
+        var expected = """
+                fullTracing = true
+                Full Tracing On
+                fullTracing = false
+                ID
+                replIn
+                '='
+                enter   stmt
+                consume
+                'false'
+                consume
+                enter   expr
+                EOF
+                consume
+                exit    expr
+                exit    stmt
+                consume
+                exit    replIn
+                Full Tracing Off
+                9
+                9.0
+                """;
+        verifyRun(source, expected);
+    }
+
+    private Terminal getTerminal(String inputString) throws IOException {
+        var inputStream = new ByteArrayInputStream(inputString.getBytes());
+        return TerminalBuilder.builder() //
+                .streams(inputStream, System.out) //
+                .jna(true) //
+                .build();
     }
 
     private void verifyRun(String source, String expected) throws Exception {
@@ -139,7 +199,7 @@ public class REPLTest {
         var preppedSource = pair.a;
         var preppedExpected = pair.b;
         capturedOutput = tapSystemErrAndOutNormalized(() -> {
-            repl.run(inputStream(preppedSource));
+            repl.run(getTerminal(preppedSource));
         });
         assertMatchedOutput(preppedExpected);
     }

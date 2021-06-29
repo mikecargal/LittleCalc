@@ -1,14 +1,15 @@
 package net.cargal.littlecalc;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenFactory;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import net.cargal.littlecalc.LittleCalcParser.ReplInContext;
@@ -21,16 +22,16 @@ public class LittleCalcRepl {
     private LittleCalcLexer lexer;
     private CommonTokenStream tokenStream;
     private LittleCalcParser parser;
-    private LittleCalcREPLVisitor replVisitor;
+    private LittleCalcExecutionVisitor replVisitor;
     private LittleReplErrorListener replErrListener;
     private LittleCalcSemanticValidationListener listener;
 
     public static void main(String... args) throws IOException {
-        new LittleCalcRepl().run(System.in);
+        new LittleCalcRepl().run(TerminalBuilder.builder().build());
     }
 
-    void run(InputStream inputStream) throws IOException {
-        var lineReader = getLineReader(inputStream);
+    void run(Terminal terminal) {
+        var lineReader = getLineReader(terminal);
         initParser();
         var parseString = "";
         while (true) {
@@ -42,13 +43,10 @@ public class LittleCalcRepl {
         System.out.println("Exiting...");
     }
 
-    LineReader getLineReader(InputStream inputStream) throws IOException {
-        var terminal = TerminalBuilder.builder() //
-                .streams(inputStream, System.out) //
-             //   .jna(true) //
-                .build();
+    LineReader getLineReader(Terminal terminal) {
         return LineReaderBuilder.builder() //
-                .terminal(terminal).option(Option.DISABLE_EVENT_EXPANSION, true) //
+                .terminal(terminal) //
+                .option(Option.DISABLE_EVENT_EXPANSION, true) //
                 .build();
     }
 
@@ -61,7 +59,7 @@ public class LittleCalcRepl {
         tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
         listener = new LittleCalcSemanticValidationListener();
-        replVisitor = new LittleCalcREPLVisitor(parser);
+        replVisitor = new LittleCalcExecutionVisitor();
 
         replErrListener = new LittleReplErrorListener();
         parser.removeErrorListeners();
@@ -92,7 +90,8 @@ public class LittleCalcRepl {
         lexer.setInputStream(CharStreams.fromString(source));
         tokenStream.setTokenSource(lexer);
         parser.setTokenStream(tokenStream);
-        parser.setTrace(replVisitor.isTracing());
+        lexer.setTokenFactory(replVisitor.isLexerTracing() ? TracingTokenFactory.DEFAULT : CommonTokenFactory.DEFAULT);
+        parser.setTrace(replVisitor.isParserTracing());
         return parser.replIn();
     }
 

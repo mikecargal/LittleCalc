@@ -17,6 +17,7 @@ import net.cargal.littlecalc.LittleCalcParser.MulDivExprContext;
 import net.cargal.littlecalc.LittleCalcParser.NegationExprContext;
 import net.cargal.littlecalc.LittleCalcParser.NumberExprContext;
 import net.cargal.littlecalc.LittleCalcParser.OrExprContext;
+import net.cargal.littlecalc.LittleCalcParser.ParenExprContext;
 import net.cargal.littlecalc.LittleCalcParser.StringExprContext;
 import net.cargal.littlecalc.LittleCalcParser.TernaryExprContext;
 import net.cargal.littlecalc.LittleCalcParser.TrueExprContext;
@@ -29,12 +30,6 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
         this.variables = variables;
     }
 
-    // @Override
-    // protected LittleValue aggregateResult(LittleValue aggregate, LittleValue
-    // nextResult) {
-    // return (nextResult != null) ? nextResult : aggregate;
-    // }
-
     @Override
     public LittleValue visitIDExpr(IDExprContext ctx) {
         var idVal = variables.get(ctx.ID().getText());
@@ -45,6 +40,11 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
     @Override
     public LittleValue visitExpExpr(ExpExprContext ctx) {
         return lvNumber(Math.pow(number(ctx.base), number(ctx.exp)), ctx);
+    }
+
+    @Override
+    public LittleValue visitParenExpr(ParenExprContext ctx) {
+        return visit(ctx.expr());
     }
 
     @Override

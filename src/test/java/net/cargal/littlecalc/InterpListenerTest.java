@@ -22,7 +22,7 @@ public class InterpListenerTest {
     private LittleCalcSemanticValidationListener listener;
     private String capturedOutput;
     private LittleCalcParser parser;
-    private LittleCalcInterpVisitor visitor;
+    private LittleCalcExecutionVisitor visitor;
     private ParserRuleContext parseTree;
 
     private void interpret(Function<LittleCalcParser, ParserRuleContext> parseRule, String source) {
@@ -37,7 +37,7 @@ public class InterpListenerTest {
                     listener = new LittleCalcSemanticValidationListener();
                     ParseTreeWalker.DEFAULT.walk(listener, parseTree);
                     if (!listener.hasErrors()) {
-                        visitor = new LittleCalcInterpVisitor();
+                        visitor = new LittleCalcExecutionVisitor();
                         visitor.visit(parseTree);
                     }
                 }
@@ -78,6 +78,16 @@ public class InterpListenerTest {
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals("Mike", visitor.getVar("a").get().string());
         assertEquals("Chris", visitor.getVar("b").get().string());
+    }
+
+    @Test
+    void testParenExpr() throws Exception {
+        interpret(LittleCalcParser::stmts, """
+                x = 8 * (5 + 6)
+                """);
+        ;
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(88.0, visitor.getVar("x").get().number());
     }
 
     @Test
@@ -211,7 +221,7 @@ public class InterpListenerTest {
         assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
 
         var ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            new LittleCalcInterpVisitor().visit(parseTree);
+            new LittleCalcExecutionVisitor().visit(parseTree);
         });
         assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage().trim());
     }

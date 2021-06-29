@@ -37,7 +37,7 @@ class LittleCalcTest {
     @Test
     void testParseError() throws Exception {
         var source = """
-                    x = 9 * + 4
+                x = 9 * + 4
                 """;
 
         var expected = """
@@ -49,7 +49,7 @@ class LittleCalcTest {
     @Test
     void testSemanticError() throws Exception {
         var source = """
-                    x = 9 * "nope"
+                x = 9 * "nope"
                 """;
 
         var expected = """
@@ -61,7 +61,7 @@ class LittleCalcTest {
     @Test
     void testRuntimeError() throws Exception {
         var source = """
-                    x = y
+                x = y
                 """;
 
         var expected = """
