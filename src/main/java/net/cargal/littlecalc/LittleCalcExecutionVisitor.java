@@ -2,24 +2,34 @@ package net.cargal.littlecalc;
 
 import java.util.Optional;
 
+import org.antlr.v4.gui.Trees;
+import org.antlr.v4.runtime.Parser;
 import org.tinylog.Logger;
 
 import net.cargal.littlecalc.LittleCalcParser.AssignmentStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.GuiStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintVarsContext;
 import net.cargal.littlecalc.LittleCalcParser.ReplExprContext;
+import net.cargal.littlecalc.LittleCalcParser.TreeStmtContext;
 
 public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     protected SymbolTable<LittleValue> variables = new SymbolTable<>();
     protected LittleCalcExprVisitor exprVisitor;
-     private static final String FULL_TRACING_CMD = "fullTracing";
+    private static final String FULL_TRACING_CMD = "fullTracing";
     private static final String LEXER_TRACING_CMD = "lexerTracing";
     private static final String PARSER_TRACING_CMD = "parserTracing";
     private boolean parserTracing = false;
     private boolean lexerTracing = false;
+    private Parser parser;
+
+    public LittleCalcExecutionVisitor(Parser parser) {
+        this();
+        this.parser = parser;
+    }
 
     public LittleCalcExecutionVisitor() {
-         exprVisitor = new LittleCalcExprVisitor(variables);
+        exprVisitor = new LittleCalcExprVisitor(variables);
     }
 
     @Override
@@ -45,6 +55,30 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     @Override
     public Void visitReplExpr(ReplExprContext ctx) {
         System.out.println(exprVisitor.visit(ctx.expr()));
+        return null;
+    }
+
+    @Override
+    public Void visitGuiStmt(GuiStmtContext ctx) {
+        if (parser != null) {
+            if (ctx.expr() != null) {
+                Trees.inspect(ctx.expr(), parser);
+            } else {
+                Trees.inspect(ctx.stmts(), parser);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitTreeStmt(TreeStmtContext ctx) {
+        if (parser != null) {
+            if (ctx.expr() != null) {
+                System.out.println(ctx.expr().toStringTree(parser));
+            } else {
+                System.out.println(ctx.stmts().toStringTree(parser));
+            }
+        }
         return null;
     }
 

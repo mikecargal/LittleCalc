@@ -50,16 +50,16 @@ class LittleValueTest {
 
         lv1 = LittleValue.numberValue(D1_0, mockContext);
         lv2 = LittleValue.numberValue(D2_0, LINE, COLUMN);
-        lv2Dup = LittleValue.numberValue(D2_0,  LINE, COLUMN);
-        lv3 = LittleValue.numberValue(D3_0,  LINE, COLUMN);
+        lv2Dup = LittleValue.numberValue(D2_0, LINE, COLUMN);
+        lv3 = LittleValue.numberValue(D3_0, LINE, COLUMN);
         lvA = LittleValue.stringValue(AAA, mockContext);
-        lvB = LittleValue.stringValue(BBB,  LINE, COLUMN);
-        lvBDup = LittleValue.stringValue(BBB,  LINE, COLUMN);
-        lvC = LittleValue.stringValue(CCC,  LINE, COLUMN);
+        lvB = LittleValue.stringValue(BBB, LINE, COLUMN);
+        lvBDup = LittleValue.stringValue(BBB, LINE, COLUMN);
+        lvC = LittleValue.stringValue(CCC, LINE, COLUMN);
         lvTrue = LittleValue.booleanValue(true, mockContext);
-        lvTrueDup = LittleValue.booleanValue(true,  LINE, COLUMN);
-        lvFalse = LittleValue.booleanValue(false,  LINE, COLUMN);
-        lvFalseDup = LittleValue.booleanValue(false,  LINE, COLUMN);
+        lvTrueDup = LittleValue.booleanValue(true, LINE, COLUMN);
+        lvFalse = LittleValue.booleanValue(false, LINE, COLUMN);
+        lvFalseDup = LittleValue.booleanValue(false, LINE, COLUMN);
     }
 
     @Test
@@ -345,17 +345,17 @@ class LittleValueTest {
         var ex = assertThrows(LittleCalcImplementationException.class, () -> {
             LVComparableOp.fromTokenType(LittleCalcLexer.ADD);
         });
-        assertEquals("Invalid Comparable Op (25) (this is an indication of an implementation error, not user error)",
-                ex.getMessage());
+        assertEquals("Invalid Comparable Op (" + LittleCalcLexer.ADD
+                + ") (this is an indication of an implementation error, not user error)", ex.getMessage());
     }
 
     @Test
     void testBadEquatableOp() {
         var ex = assertThrows(LittleCalcImplementationException.class, () -> {
-            LVEquatableOp.fromTokenType(LittleCalcLexer.ADD);
+            LVEquatableOp.fromTokenType(LittleCalcLexer.DIV);
         });
-        assertEquals("Invalid Equatable Op (25) (this is an indication of an implementation error, not user error)",
-                ex.getMessage());
+        assertEquals("Invalid Equatable Op (" + LittleCalcLexer.DIV
+                + ") (this is an indication of an implementation error, not user error)", ex.getMessage());
     }
 
     @Test

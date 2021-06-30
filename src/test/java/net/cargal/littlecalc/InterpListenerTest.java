@@ -289,9 +289,9 @@ public class InterpListenerTest {
                 8 * 9 ^ / (mike / v)
                 """);
         var expected = """
-                line 2:0 extraneous input '8' expecting {<EOF>, PRINT, 'vars', ID}
-                line 2:16 mismatched input '/' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', '^', '*', '/', '+', '-', '?', ID}
-                line 2:19 mismatched input ')' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', '^', '*', '/', '+', '-', '?', ID}
+                line 2:0 extraneous input '8' expecting {<EOF>, PRINT, 'vars', 'gui', 'tree', ID}
+                line 2:16 mismatched input '/' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', 'gui', 'tree', '^', '*', '/', '+', '-', '?', ID}
+                line 2:19 mismatched input ')' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', 'gui', 'tree', '^', '*', '/', '+', '-', '?', ID}
                 """;
         assertEquals(3, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, capturedOutput);

@@ -17,7 +17,7 @@ public class TracingTokenFactoryTest {
         var lexer = new LittleCalcLexer(charStream);
         var source = new Pair<TokenSource, CharStream>(lexer, charStream);
 
-        var expectedTokenString = "[@-1,0:5='hello',<31>,1:0]";
+        var expectedTokenString = "[@-1,0:5='hello',<" + LittleCalcLexer.ID + ">,1:0]";
         var capturedOutput = tapSystemErrAndOutNormalized(() -> {
             CommonToken symbol = TracingTokenFactory.DEFAULT.create(source, LittleCalcLexer.ID, "hello", 0, 0, 5, 1, 0);
             assertEquals(expectedTokenString, symbol.toString());
@@ -27,7 +27,7 @@ public class TracingTokenFactoryTest {
 
     @Test
     void testSimpleCreat() throws Exception {
-        var expectedTokenString = "[@-1,0:0='9',<29>,0:-1]";
+        var expectedTokenString = "[@-1,0:0='9',<" + LittleCalcLexer.NUMBER + ">,0:-1]";
         var capturedOutput = tapSystemErrAndOutNormalized(() -> {
             CommonToken symbol = TracingTokenFactory.DEFAULT.create(LittleCalcLexer.NUMBER, "9");
             assertEquals(expectedTokenString, symbol.toString());

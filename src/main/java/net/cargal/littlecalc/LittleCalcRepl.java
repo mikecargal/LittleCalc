@@ -59,7 +59,7 @@ public class LittleCalcRepl {
         tokenStream = new CommonTokenStream(lexer);
         parser = new LittleCalcParser(tokenStream);
         listener = new LittleCalcSemanticValidationListener();
-        replVisitor = new LittleCalcExecutionVisitor();
+        replVisitor = new LittleCalcExecutionVisitor(parser);
 
         replErrListener = new LittleReplErrorListener();
         parser.removeErrorListeners();

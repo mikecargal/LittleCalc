@@ -5,9 +5,11 @@ replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
 
 stmts: stmt* EOF;
 stmt
-    : ID '=' expr # AssignmentStmt
-    | PRINT expr* # PrintStmt
-    | VARS        # printVars
+    : ID '=' expr                 # AssignmentStmt
+    | PRINT expr*                 # PrintStmt
+    | VARS                        # printVars
+    | TREE '{' (expr | stmts) '}' # treeStmt
+    | GUI '{' (expr | stmts) '}'  # guiStmt
     ;
 expr
     : '(' expr ')'                                   # ParenExpr
@@ -43,11 +45,14 @@ OR:     '||';
 
 TRUE:  'true';
 FALSE: 'false';
+
 PRINT
     : [Pp][Rr][Ii][Nn][Tt]
     ; // one way to handle case-insenstive
 VARS:  'vars';
 STACK: 'stack';
+GUI:   'gui';
+TREE:  'tree';
 
 // Symbol Tokens
 O_PAREN: '(';
