@@ -1,5 +1,6 @@
 package net.cargal.littlecalc;
 
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -15,7 +16,8 @@ public class LittleReplErrorListener extends ConsoleErrorListener {
             int charPositionInLine, //
             String msg, //
             RecognitionException e) {
-        if (e != null && e.getOffendingToken().getType() == Recognizer.EOF) {
+        if (offendingSymbol instanceof Token && //
+                ((Token) offendingSymbol).getType() == Recognizer.EOF) {
             errorAtEOF = true;
         } else {
             super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);

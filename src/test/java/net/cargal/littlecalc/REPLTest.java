@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class REPLTest extends LCTestBase {
@@ -75,7 +76,6 @@ public class REPLTest extends LCTestBase {
                 7
                 """;
         verifyRun(source, expected);
-
     }
 
     @Test
@@ -184,6 +184,49 @@ public class REPLTest extends LCTestBase {
         verifyRun(source, expected);
     }
 
+    @Test
+    @Disabled
+    void testSimplifyEqTrue() throws Exception {
+        var source = """
+                s = false
+                simplify { s == true }
+                """;
+        var expected = """
+                s = false
+                simplify { s == true }
+                s
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testPendingCloseBracket() throws Exception {
+        var source = """
+                tree {
+                   5
+                }
+                """;
+        var expected = """
+                tree {
+                    5 
+                }
+                (expr 5)
+                """;
+        verifyRun(source, expected);
+    }
+
+    @Test
+    void testTreeCommand() throws Exception {
+        var source = """
+                tree { 5 + 7 * 9 }
+                """;
+        var expected = """
+                tree { 5 + 7 * 9 }
+                (expr (expr 5) + (expr (expr 7) * (expr 9)))
+                """;
+        verifyRun(source, expected);
+    }
+
     private Terminal getTerminal(String inputString) throws IOException {
         var inputStream = new ByteArrayInputStream(inputString.getBytes());
         return TerminalBuilder.builder() //
@@ -199,7 +242,7 @@ public class REPLTest extends LCTestBase {
         capturedOutput = tapSystemErrAndOutNormalized(() -> {
             repl.run(getTerminal(preppedSource));
         });
-        assertMatchedOutput(preppedExpected,capturedOutput);
+        assertMatchedOutput(preppedExpected, capturedOutput);
     }
 
     private Pair<String, String> prep(String source, String expected) {
@@ -210,6 +253,5 @@ public class REPLTest extends LCTestBase {
                 """;
         return new Pair<>(resSource, resExpected);
     }
-
 
 }

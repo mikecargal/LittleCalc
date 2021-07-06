@@ -5,11 +5,12 @@ replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
 
 stmts: stmt* EOF;
 stmt
-    : ID '=' expr                 # AssignmentStmt
-    | PRINT expr*                 # PrintStmt
-    | VARS                        # printVars
-    | TREE '{' (expr | stmts) '}' # treeStmt
-    | GUI '{' (expr | stmts) '}'  # guiStmt
+    : ID '=' expr                     # AssignmentStmt
+    | PRINT expr*                     # PrintStmt
+    | VARS                            # printVars
+    | TREE '{' (expr | stmts) '}'     # treeStmt
+    | GUI '{' (expr | stmts) '}'      # guiStmt
+    | SIMPLIFY '{' (expr | stmts) '}' # simplifyStmt
     ;
 expr
     : '(' expr ')'                                   # ParenExpr
@@ -49,10 +50,11 @@ FALSE: 'false';
 PRINT
     : [Pp][Rr][Ii][Nn][Tt]
     ; // one way to handle case-insenstive
-VARS:  'vars';
+VARS:  V A R S;
 STACK: 'stack';
 GUI:   'gui';
 TREE:  'tree';
+SIMPLIFY: 'simplify';
 
 // Symbol Tokens
 O_PAREN: '(';
@@ -76,3 +78,11 @@ ID:             (ALPHA | '_') (ALPHA | DIGIT | '_')*;
 COMMENT:        '//' .*? ('\n' | EOF) -> skip;
 WS:             [ \t\r\n]+            -> skip;
 BAD_TOKEN:      .;
+
+fragment A: [Aa];
+//...
+fragment R: [Rr];
+//...
+fragment S: [Ss];
+//...
+fragment V: [Vv];
