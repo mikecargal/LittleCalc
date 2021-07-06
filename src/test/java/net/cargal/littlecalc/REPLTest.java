@@ -1,8 +1,6 @@
 package net.cargal.littlecalc;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemErrAndOutNormalized;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -14,7 +12,7 @@ import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class REPLTest {
+public class REPLTest extends LCTestBase {
 
     private LittleCalcRepl repl;
     private String capturedOutput;
@@ -201,7 +199,7 @@ public class REPLTest {
         capturedOutput = tapSystemErrAndOutNormalized(() -> {
             repl.run(getTerminal(preppedSource));
         });
-        assertMatchedOutput(preppedExpected);
+        assertMatchedOutput(preppedExpected,capturedOutput);
     }
 
     private Pair<String, String> prep(String source, String expected) {
@@ -213,18 +211,5 @@ public class REPLTest {
         return new Pair<>(resSource, resExpected);
     }
 
-    private void assertMatchedOutput(String expected) {
-        var expectedLines = expected.split("\n");
-        var outputLines = capturedOutput.split("[\n\r]+");
 
-        if (expectedLines.length != outputLines.length) {
-            System.out.println(expected);
-            System.out.println(capturedOutput);
-        }
-
-        for (int i = 0; i < expectedLines.length; i++) {
-            assertThat(outputLines[i], containsString(expectedLines[i]));
-        }
-        assertEquals(expectedLines.length, outputLines.length);
-    }
 }

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
-public class InterpListenerTest {
+public class InterpListenerTest extends LCTestBase {
 
     private LittleCalcSemanticValidationListener listener;
     private String capturedOutput;
@@ -289,12 +289,12 @@ public class InterpListenerTest {
                 8 * 9 ^ / (mike / v)
                 """);
         var expected = """
-                line 2:0 extraneous input '8' expecting {<EOF>, PRINT, 'vars', 'gui', 'tree', ID}
-                line 2:16 mismatched input '/' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', 'gui', 'tree', '^', '*', '/', '+', '-', '?', ID}
-                line 2:19 mismatched input ')' expecting {<EOF>, '==', '!=', '<', '<=', '>', '>=', '&&', '||', PRINT, 'vars', 'gui', 'tree', '^', '*', '/', '+', '-', '?', ID}
+                line 2:0 extraneous input '8' expecting 
+                line 2:16 mismatched input '/' expecting 
+                line 2:19 mismatched input ')' expecting 
                 """;
         assertEquals(3, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, capturedOutput);
+        assertMatchedOutput(expected, capturedOutput);
     }
 
     // TODO: Unit tests to verify precedence
