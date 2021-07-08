@@ -1,7 +1,6 @@
 grammar LittleCalc
     ;
-import LittleCalcLexerRules; // would not work
-//options { tokenVocab=LittleCalcLexer; }
+import LittleCalcLexerRules; 
 
 replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
 calcIn: stmts EOF;
