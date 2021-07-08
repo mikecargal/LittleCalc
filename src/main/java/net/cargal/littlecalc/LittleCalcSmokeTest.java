@@ -11,7 +11,7 @@ public class LittleCalcSmokeTest {
         var lexer = new LittleCalcLexer(charStream);
         var tokenStream = new CommonTokenStream(lexer);
         var parser = new LittleCalcParser(tokenStream);
-        var stmts = parser.stmts();
-        System.out.println(stmts.toStringTree(parser));
+        var calcIn = parser.calcIn();
+        System.out.println(calcIn.toStringTree(parser));
     }
 }

@@ -28,7 +28,7 @@
             "request": "launch",
             "input": "${workspaceFolder}/little.ltl",
             "grammar": "${workspaceFolder}/src/main/antlr/net/cargal/littlecalc/LittleCalc.g4",
-            "startRule": "stmts",
+            "startRule": "calcIn",
             "printParseTree": true,
             "visualParseTree": true
         }

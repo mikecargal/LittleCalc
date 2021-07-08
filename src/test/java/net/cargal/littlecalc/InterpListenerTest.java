@@ -51,14 +51,14 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testNumberAssignment() {
-        interpret(LittleCalcParser::stmts, "a=1.0");
+        interpret(LittleCalcParser::calcIn, "a=1.0");
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(1.0, visitor.getVar("a").get().number());
     }
 
     @Test
     void testBooleanAssignment() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a=true
                 b=false
                 c = 3 < 4
@@ -71,7 +71,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testStringAssignment() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a='Mike'
                 b="Chris"
                 """);
@@ -82,7 +82,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testParenExpr() throws Exception {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 x = 8 * (5 + 6)
                 """);
         ;
@@ -92,7 +92,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testAddSub() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a=8+9
                 b=9-8
                 c=9-8+7
@@ -105,7 +105,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testMulDiv() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a=8*9
                 b=9/3
                 c=9/3*7
@@ -118,7 +118,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testExp() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a=2^2
                 b=25^0.5
                 c=2^4^0.5
@@ -131,7 +131,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testTernary() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a= true ? 2 : 3
                 b= false ? 2 : 3
                 c= 2<3 ? "yes" : "no"
@@ -144,7 +144,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testBadTernary() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a= true ? 2 : "3"
                 """);
         assertEquals("line:1 col:4 -- true and false branches must share the same type (STRING,NUMBER)",
@@ -153,7 +153,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testNotNumber() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a =  2 + "3"
                 """);
         assertEquals("line:1 col:10 -- \"3\" is not numeric", capturedOutput.trim());
@@ -161,7 +161,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testNotBoolean() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = true && 3
                 """);
         assertEquals("line:1 col:13 -- 3 is not boolean", capturedOutput.trim());
@@ -169,7 +169,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testBadCompare() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = 1 < "3"
                 """);
         assertEquals("line:1 col:5 -- can not compare NUMBER to STRING", capturedOutput.trim());
@@ -177,7 +177,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testreset() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = 1 < "3"
                 """);
         assertTrue(listener.hasErrors());
@@ -187,7 +187,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testPrint() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = true
                 Print "The test worked = " a
                 """);
@@ -198,7 +198,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testVars() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = "Test"
                 b = 0.5
                 c = b < 2
@@ -215,7 +215,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testNoValue() throws Exception {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = b
                 """);
         assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
@@ -228,7 +228,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testEquatlity() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a = 2 == 2
                 b = 2 != 2
                 c = 3 != 4
@@ -242,7 +242,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testAnd() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a= true && false
                 b= false && true
                 c = true && true
@@ -257,7 +257,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void testOr() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a= true || false
                 b= false || true
                 c = true || true
@@ -272,7 +272,7 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void TestNot() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 a= !true
                 b= !false
                 """);
@@ -284,16 +284,14 @@ public class InterpListenerTest extends LCTestBase {
 
     @Test
     void TestParseError() {
-        interpret(LittleCalcParser::stmts, """
+        interpret(LittleCalcParser::calcIn, """
                 mike = 10
-                8 * 9 ^ / (mike / v)
+                print 8 * 9 ^ / (mike / 6)
                 """);
         var expected = """
-                line 2:0 extraneous input '8' expecting 
-                line 2:16 mismatched input '/' expecting 
-                line 2:19 mismatched input ')' expecting 
+                line 2:14 extraneous input '/' expecting 
                 """;
-        assertEquals(3, parser.getNumberOfSyntaxErrors());
+        assertEquals(1, parser.getNumberOfSyntaxErrors());
         assertMatchedOutput(expected, capturedOutput);
     }
 

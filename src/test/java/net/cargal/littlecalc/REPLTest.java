@@ -142,8 +142,11 @@ public class REPLTest extends LCTestBase {
                 Lexer Tracing On
                 lexerTracing = false
                 ID
+                WS
                 '='
+                WS
                 'false'
+                WS
                 EOF
                 Lexer Tracing Off
                 9
@@ -165,12 +168,15 @@ public class REPLTest extends LCTestBase {
                 fullTracing = false
                 ID
                 replIn
+                WS
                 '='
                 enter   stmt
                 consume
+                WS
                 'false'
                 consume
                 enter   expr
+                WS
                 EOF
                 consume
                 exit    expr
@@ -185,16 +191,25 @@ public class REPLTest extends LCTestBase {
     }
 
     @Test
-    @Disabled
     void testSimplifyEqTrue() throws Exception {
         var source = """
                 s = false
-                simplify { s == true }
+                t = 9 == 27 / 3
+                simplify { 
+                    print s == true 
+                    print t == true
+                }
                 """;
         var expected = """
                 s = false
-                simplify { s == true }
-                s
+                t = 9 == 27 / 3
+                simplify { 
+                    print s == true 
+                    print t == true
+                }
+                
+                print s 
+                print t 
                 """;
         verifyRun(source, expected);
     }

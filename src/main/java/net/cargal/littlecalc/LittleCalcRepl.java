@@ -38,7 +38,7 @@ public class LittleCalcRepl {
             var input = getInput(lineReader, parseString);
             if (input.trim().equals("quit"))
                 break;
-            parseString = process(parseString + input);
+            parseString = process(parseString + input + "\n");
         }
         System.out.println("Exiting...");
     }

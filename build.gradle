@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     antlr "org.antlr:antlr4:4.9.2"
+    
     implementation 'org.tinylog:tinylog-api:2.4.0-M1'
     implementation 'org.tinylog:tinylog-impl:2.4.0-M1'
 
@@ -43,9 +44,9 @@ generateGrammarSource {
     maxHeapSize = "64m"
     arguments += [  "-visitor", 
                     "-listener",
-                    "-atn",
                     "-long-messages",
                     "-package", "net.cargal.littlecalc",
+                    "-lib", "src/main/antlr/net/cargal/littlecalc"
                 ]
 }
 

@@ -18,11 +18,11 @@ public class LittleCalc {
         var parser = new LittleCalcParser(tokenStream);
         var listener = new LittleCalcSemanticValidationListener();
 
-        var stmts = parser.stmts();
+        var calcIn = parser.calcIn();
         if (parser.getNumberOfSyntaxErrors() == 0) {
-            ParseTreeWalker.DEFAULT.walk(listener, stmts);
+            ParseTreeWalker.DEFAULT.walk(listener, calcIn);
             if (!listener.hasErrors()) {
-                new LittleCalcExecutionVisitor().visit(stmts);
+                new LittleCalcExecutionVisitor().visit(calcIn);
             }
         }
     }
