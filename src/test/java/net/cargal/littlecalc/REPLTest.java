@@ -84,7 +84,7 @@ public class REPLTest extends LCTestBase {
                 """;
         var expected = """
                 8 * * 9
-                no viable alternative at input '8 * *'
+                extraneous input '*' expecting {
                 """;
         verifyRun(source, expected);
     }
@@ -113,6 +113,7 @@ public class REPLTest extends LCTestBase {
                 Parser Tracing On
                 parserTracing = false
                 replIn
+                enter   stmts
                 enter   stmt
                 consume
                 consume
@@ -120,6 +121,7 @@ public class REPLTest extends LCTestBase {
                 consume
                 exit    expr
                 exit    stmt
+                exit    stmts
                 consume
                 exit    replIn
                 Parser Tracing Off
@@ -166,10 +168,11 @@ public class REPLTest extends LCTestBase {
                 Full Tracing On
                 fullTracing = false
                 ID
-                replIn
+                enter   replIn
+                enter   stmts
+                enter   stmt
                 WS
                 '='
-                enter   stmt
                 consume
                 WS
                 'false'
@@ -180,6 +183,7 @@ public class REPLTest extends LCTestBase {
                 consume
                 exit    expr
                 exit    stmt
+                exit    stmts
                 consume
                 exit    replIn
                 Full Tracing Off
@@ -194,7 +198,7 @@ public class REPLTest extends LCTestBase {
         var source = """
                 s = false
                 t = 9 == 27 / 3
-                simplify { 
+                refactor { 
                     print s == true 
                     print t == true
                 }
@@ -202,7 +206,7 @@ public class REPLTest extends LCTestBase {
         var expected = """
                 s = false
                 t = 9 == 27 / 3
-                simplify { 
+                refactor { 
                     print s == true 
                     print t == true
                 }

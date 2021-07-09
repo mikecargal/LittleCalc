@@ -3,18 +3,22 @@ grammar LittleCalc
 import LittleCalcLexerRules
     ;
 
-replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
+replIn: stmts EOF # replStmts | antlrUtil EOF # AntlrUtilStmt;
+
 calcIn: stmts EOF;
 
 stmts: stmt*;
 stmt
-    : ID '=' expr                     # AssignmentStmt
-    | PRINT expr*                     # PrintStmt
-    | expr                            # ImplicitPrintStmt
-    | VARS                            # PrintVars
-    | TREE '{' (expr | stmts) '}'     # TreeStmt
-    | GUI '{' (expr | stmts) '}'      # GUIStmt
-    | SIMPLIFY '{' (expr | stmts) '}' # SimplifyStmt
+    : ID '=' expr # AssignmentStmt
+    | PRINT expr* # PrintStmt
+    | expr        # ImplicitPrintStmt
+    | VARS        # PrintVars
+    ;
+
+antlrUtil
+    : TREE '{' (stmts | antlrUtil) '}'     # TreeUtil
+    | GUI '{' (stmts | antlrUtil) '}'      # GUIUtil
+    | REFACTOR '{' (stmts | antlrUtil) '}' # RefactorUtil
     ;
 
 expr

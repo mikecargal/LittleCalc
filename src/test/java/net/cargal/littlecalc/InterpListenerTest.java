@@ -289,9 +289,10 @@ public class InterpListenerTest extends LCTestBase {
                 print 8 * 9 ^ / (mike / 6)
                 """);
         var expected = """
-                line 2:14 extraneous input '/' expecting 
+                no viable alternative at input '8 * 9 ^ /
+                extraneous input '/' expecting 
                 """;
-        assertEquals(1, parser.getNumberOfSyntaxErrors());
+        assertEquals(2, parser.getNumberOfSyntaxErrors());
         assertMatchedOutput(expected, capturedOutput);
     }
 

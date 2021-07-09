@@ -6,19 +6,28 @@ import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.tinylog.Logger;
 
+import net.cargal.littlecalc.LittleCalcParser.AddSubExprContext;
 import net.cargal.littlecalc.LittleCalcParser.AssignmentStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.EqualityExprContext;
-import net.cargal.littlecalc.LittleCalcParser.GUIStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.GUIUtilContext;
 import net.cargal.littlecalc.LittleCalcParser.ImplicitPrintStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.MulDivExprContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintVarsContext;
-import net.cargal.littlecalc.LittleCalcParser.ReplExprContext;
-import net.cargal.littlecalc.LittleCalcParser.SimplifyStmtContext;
-import net.cargal.littlecalc.LittleCalcParser.TreeStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.RefactorUtilContext;
+import net.cargal.littlecalc.LittleCalcParser.TreeUtilContext;
 
 public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
+    private static final String ANY_EXPR_XPATH = "//expr";
+    private ParseTreePattern eqTruePattern;
+    private ParseTreePattern eqFalsePattern;
+    private ParseTreePattern neTruePattern;
+    private ParseTreePattern neFalsePattern;
+    private ParseTreePattern plus0Pattern;
+    private ParseTreePattern times1Pattern;
     protected SymbolTable<LittleValue> variables = new SymbolTable<>();
     protected LittleCalcExprVisitor exprVisitor;
     private static final String FULL_TRACING_CMD = "fullTracing";
@@ -32,6 +41,13 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     public LittleCalcExecutionVisitor(Parser parser) {
         this();
         this.parser = parser;
+        var exprRule = LittleCalcParser.RULE_expr;
+        eqTruePattern = parser.compileParseTreePattern("<expr> == <TRUE>", exprRule);
+        neTruePattern = parser.compileParseTreePattern("<expr> != <TRUE>", exprRule);
+        eqFalsePattern = parser.compileParseTreePattern("<expr> == <FALSE>", exprRule);
+        neFalsePattern = parser.compileParseTreePattern("<expr> != <FALSE>", exprRule);
+        plus0Pattern = parser.compileParseTreePattern("<expr> + 0", exprRule);
+        times1Pattern = parser.compileParseTreePattern("<expr> * 1", exprRule);
         rewriter = new TokenStreamRewriter(parser.getInputStream());
     }
 
@@ -66,41 +82,29 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitReplExpr(ReplExprContext ctx) {
-        System.out.println(exprVisitor.visit(ctx.expr()));
-        return null;
-    }
-
-    @Override
-    public Void visitGUIStmt(GUIStmtContext ctx) {
+    public Void visitGUIUtil(GUIUtilContext ctx) {
         if (parser != null) {
-            if (ctx.expr() != null) {
-                Trees.inspect(ctx.expr(), parser);
-            } else {
-                Trees.inspect(ctx.stmts(), parser);
-            }
+            var content = ctx.stmts() == null ? ctx.antlrUtil() : ctx.stmts();
+            Trees.inspect(content, parser);
         }
         return null;
     }
 
     @Override
-    public Void visitTreeStmt(TreeStmtContext ctx) {
+    public Void visitTreeUtil(TreeUtilContext ctx) {
         if (parser != null) {
-            if (ctx.expr() != null) {
-                System.out.println(ctx.expr().toStringTree(parser));
-            } else {
-                System.out.println(ctx.stmts().toStringTree(parser));
-            }
+            var content = ctx.stmts() == null ? ctx.antlrUtil() : ctx.stmts();
+            System.out.println(content.toStringTree(parser));
         }
         return null;
     }
 
     @Override
-    public Void visitSimplifyStmt(SimplifyStmtContext ctx) {
+    public Void visitRefactorUtil(RefactorUtilContext ctx) {
         var contentInterval = new Interval( //
                 ctx.O_CURLY().getSymbol().getTokenIndex() + 1, //
                 ctx.C_CURLY().getSymbol().getTokenIndex() - 1);
-        var pName = "simplify"+ctx.getStart().getTokenIndex();
+        var pName = "simplify" + ctx.getStart().getTokenIndex();
 
         eqTrue(ctx, pName);
         neTrue(ctx, pName);
@@ -109,66 +113,54 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         plus0(ctx, pName);
         times1(ctx, pName);
 
-        System.out.println(rewriter.getText(pName,contentInterval));
+        System.out.println(rewriter.getText(pName, contentInterval));
         return null;
     }
 
-    @SuppressWarnings("squid:S1192")
-    private void eqTrue(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> == <TRUE>", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
+    private void eqTrue(RefactorUtilContext ctx, String pName) {
+        for (var match : eqTruePattern.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (EqualityExprContext) (match.getTree());
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
 
-    private void neTrue(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> != <TRUE>", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
+    private void neTrue(RefactorUtilContext ctx, String pName) {
+        for (var match : neTruePattern.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (EqualityExprContext) (match.getTree());
             rewriter.insertBefore(pName, matchCtx.lhs.start, "!");
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
 
-    private void eqFalse(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> == <FALSE>", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
+    private void eqFalse(RefactorUtilContext ctx, String pName) {
+        for (var match : eqFalsePattern.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (EqualityExprContext) (match.getTree());
             rewriter.insertBefore(pName, matchCtx.lhs.start, "!");
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
 
-    private void neFalse(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> != <FALSE>", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
+    private void neFalse(RefactorUtilContext ctx, String pName) {
+        for (var match : neFalsePattern.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (EqualityExprContext) (match.getTree());
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
 
-    private void plus0(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> + 0", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
-            var matchCtx = (EqualityExprContext) (match.getTree());
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+    private void plus0(RefactorUtilContext ctx, String pName) {
+        for (var match : plus0Pattern.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (AddSubExprContext) (match.getTree());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
 
-    private void times1(SimplifyStmtContext ctx,String pName) {
-        var pattern = parser.compileParseTreePattern("<expr> * 1", LittleCalcParser.RULE_expr);
-        var matches = pattern.findAll(ctx, "//expr");
-        for (var match : matches) {
-            var matchCtx = (EqualityExprContext) (match.getTree());
-            rewriter.delete(pName,matchCtx.op, matchCtx.rhs.getStop());
+    private void times1(RefactorUtilContext ctx, String pName) {
+        for (var match : times1Pattern.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (MulDivExprContext) (match.getTree());
+            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
         }
     }
+
     @Override
     public Void visitPrintVars(PrintVarsContext ctx) {
         dumpVariables();

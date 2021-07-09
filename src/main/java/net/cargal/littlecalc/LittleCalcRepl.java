@@ -13,6 +13,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import net.cargal.littlecalc.LittleCalcParser.ReplInContext;
+import net.cargal.littlecalc.LittleCalcParser.AntlrUtilStmtContext;
 
 public class LittleCalcRepl {
     private static final String INITIAL_PROMPT = "> ";
@@ -75,7 +76,9 @@ public class LittleCalcRepl {
         if (replErrListener.completeInput()) {
             result = "";
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                ParseTreeWalker.DEFAULT.walk(listener, replTree);
+                if (!(replTree instanceof AntlrUtilStmtContext)) {
+                    ParseTreeWalker.DEFAULT.walk(listener, replTree);
+                }
                 if (!listener.hasErrors()) {
                     replVisitor.visit(replTree);
                 }
