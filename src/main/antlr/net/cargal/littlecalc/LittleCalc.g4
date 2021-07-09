@@ -1,6 +1,7 @@
 grammar LittleCalc
     ;
-import LittleCalcLexerRules; 
+import LittleCalcLexerRules
+    ;
 
 replIn: stmt? EOF # replStmt | expr? EOF # replExpr;
 calcIn: stmts EOF;
@@ -9,10 +10,11 @@ stmts: stmt*;
 stmt
     : ID '=' expr                     # AssignmentStmt
     | PRINT expr*                     # PrintStmt
-    | VARS                            # printVars
-    | TREE '{' (expr | stmts) '}'     # treeStmt
-    | GUI '{' (expr | stmts) '}'      # guiStmt
-    | SIMPLIFY '{' (expr | stmts) '}' # simplifyStmt
+    | expr                            # ImplicitPrintStmt
+    | VARS                            # PrintVars
+    | TREE '{' (expr | stmts) '}'     # TreeStmt
+    | GUI '{' (expr | stmts) '}'      # GUIStmt
+    | SIMPLIFY '{' (expr | stmts) '}' # SimplifyStmt
     ;
 
 expr

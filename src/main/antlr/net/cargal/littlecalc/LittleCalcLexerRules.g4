@@ -31,7 +31,6 @@ fragment S: [Ss];
 fragment V: [Vv];
 VARS:     V A R S;
 
-STACK:    'stack';
 GUI:      'gui';
 TREE:     'tree';
 SIMPLIFY: 'simplify';

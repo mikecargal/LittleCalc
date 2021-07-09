@@ -10,7 +10,8 @@ import org.tinylog.Logger;
 
 import net.cargal.littlecalc.LittleCalcParser.AssignmentStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.EqualityExprContext;
-import net.cargal.littlecalc.LittleCalcParser.GuiStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.GUIStmtContext;
+import net.cargal.littlecalc.LittleCalcParser.ImplicitPrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintVarsContext;
 import net.cargal.littlecalc.LittleCalcParser.ReplExprContext;
@@ -59,13 +60,19 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitImplicitPrintStmt(ImplicitPrintStmtContext ctx) {
+        System.out.println(exprVisitor.visit(ctx.expr()));
+        return null;
+    }
+
+    @Override
     public Void visitReplExpr(ReplExprContext ctx) {
         System.out.println(exprVisitor.visit(ctx.expr()));
         return null;
     }
 
     @Override
-    public Void visitGuiStmt(GuiStmtContext ctx) {
+    public Void visitGUIStmt(GUIStmtContext ctx) {
         if (parser != null) {
             if (ctx.expr() != null) {
                 Trees.inspect(ctx.expr(), parser);
@@ -106,6 +113,7 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         return null;
     }
 
+    @SuppressWarnings("squid:S1192")
     private void eqTrue(SimplifyStmtContext ctx,String pName) {
         var pattern = parser.compileParseTreePattern("<expr> == <TRUE>", LittleCalcParser.RULE_expr);
         var matches = pattern.findAll(ctx, "//expr");

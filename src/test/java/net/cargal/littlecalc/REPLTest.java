@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class REPLTest extends LCTestBase {
@@ -85,7 +84,7 @@ public class REPLTest extends LCTestBase {
                 """;
         var expected = """
                 8 * * 9
-                extraneous input '*' expecting
+                no viable alternative at input '8 * *'
                 """;
         verifyRun(source, expected);
     }

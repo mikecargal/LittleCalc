@@ -295,5 +295,4 @@ public class InterpListenerTest extends LCTestBase {
         assertMatchedOutput(expected, capturedOutput);
     }
 
-    // TODO: Unit tests to verify precedence
 }
