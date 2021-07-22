@@ -48,11 +48,15 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         neFalsePattern = parser.compileParseTreePattern("<expr> != <FALSE>", exprRule);
         plus0Pattern = parser.compileParseTreePattern("<expr> + 0", exprRule);
         times1Pattern = parser.compileParseTreePattern("<expr> * 1", exprRule);
-        rewriter = new TokenStreamRewriter(parser.getInputStream());
+        resetRefactoring();
     }
 
     public LittleCalcExecutionVisitor() {
         exprVisitor = new LittleCalcExprVisitor(variables);
+    }
+
+    public void resetRefactoring() {
+        rewriter = new TokenStreamRewriter(parser.getInputStream());
     }
 
     @Override
