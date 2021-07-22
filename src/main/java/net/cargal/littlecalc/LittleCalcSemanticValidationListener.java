@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.Token;
 import org.tinylog.Logger;
 
 import net.cargal.littlecalc.LittleCalcParser.AndExprContext;
+import net.cargal.littlecalc.LittleCalcParser.AntlrUtilStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.NegationExprContext;
 import net.cargal.littlecalc.LittleCalcParser.OrExprContext;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
@@ -22,6 +23,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
 
     protected Map<String, LVType> variables = new HashMap<>();
     protected Deque<LVType> typeStack = new ArrayDeque<>();
+    protected int utilLevel = 0;
 
     @Override
     public void exitAssignmentStmt(LittleCalcParser.AssignmentStmtContext ctx) {
@@ -141,6 +143,16 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
         typeStack.push(LVStringType.INSTANCE);
     }
 
+    @Override
+    public void enterAntlrUtilStmt(AntlrUtilStmtContext ctx) {
+        utilLevel++;
+    }
+
+    @Override
+    public void exitAntlrUtilStmt(AntlrUtilStmtContext ctx) {
+        utilLevel--;
+    }
+
     public void reset() {
         errorMessages.clear();
     }
@@ -150,14 +162,17 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     }
 
     private void assertNumberType(LVType type, ParserRuleContext ctx) {
+        if (!validating()) return;
         assertion(type instanceof LVNumberType, () -> ctx.getText() + " is not numeric", ctx);
     }
 
     private void assertBooleanType(LVType type, ParserRuleContext ctx) {
+        if (!validating()) return;
         assertion(type instanceof LVBooleanType, () -> ctx.getText() + " is not boolean", ctx);
     }
 
     private void assertion(boolean condition, Supplier<String> messageSupplier, ParserRuleContext ctx) {
+        if (!validating()) return;
         if (!condition) {
             Token tk = ctx.getStart();
             var msg = LittleCalcRuntimeException.message(messageSupplier.get(), tk.getLine(),
@@ -165,6 +180,10 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
             System.out.println(msg);
             errorMessages.add(msg);
         }
+    }
+
+    private boolean validating() {
+        return utilLevel == 0;
     }
 
 }
