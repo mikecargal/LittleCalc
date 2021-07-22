@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
-public class InterpListenerTest extends LCTestBase {
+public class ExecutionTest extends LCTestBase {
 
     private LittleCalcSemanticValidationListener listener;
     private String capturedOutput;
@@ -37,7 +37,7 @@ public class InterpListenerTest extends LCTestBase {
                     listener = new LittleCalcSemanticValidationListener();
                     ParseTreeWalker.DEFAULT.walk(listener, parseTree);
                     if (!listener.hasErrors()) {
-                        visitor = new LittleCalcExecutionVisitor();
+                        visitor = new LittleCalcExecutionVisitor(parser);
                         visitor.visit(parseTree);
                     }
                 }
@@ -290,10 +290,58 @@ public class InterpListenerTest extends LCTestBase {
                 """);
         var expected = """
                 no viable alternative at input '8 * 9 ^ /
-                extraneous input '/' expecting 
+                extraneous input '/' expecting
                 """;
         assertEquals(2, parser.getNumberOfSyntaxErrors());
         assertMatchedOutput(expected, capturedOutput);
+    }
+
+    @Test
+    void TestEQTrueRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { a == true }
+                """);
+        assertMatchedOutput(" a ", capturedOutput);
+    }
+
+    @Test
+    void TestNETrueRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { a != true }
+                """);
+        assertMatchedOutput(" !a ", capturedOutput);
+    }
+
+    @Test
+    void TestEQFalseRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                refactor { a == false }
+                """);
+        assertMatchedOutput(" !a ", capturedOutput);
+    }
+
+    @Test
+    void TestNEFalseRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                refactor { a != false }
+                """);
+        assertMatchedOutput(" a ", capturedOutput);
+    }
+
+    @Test
+    void TestPlus0Refactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { a + 0 - 5 }
+                """);
+        assertMatchedOutput(" a  - 5 ", capturedOutput);
+    }
+
+    @Test
+    void TestTimes1Refactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { a * 1 - 5 }
+                """);
+        assertMatchedOutput(" a  - 5 ", capturedOutput);
     }
 
 }
