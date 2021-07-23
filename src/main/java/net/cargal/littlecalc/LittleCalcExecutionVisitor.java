@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
@@ -18,6 +19,7 @@ import net.cargal.littlecalc.LittleCalcParser.MulDivExprContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintStmtContext;
 import net.cargal.littlecalc.LittleCalcParser.PrintVarsContext;
 import net.cargal.littlecalc.LittleCalcParser.RefactorUtilContext;
+import net.cargal.littlecalc.LittleCalcParser.TokensUtilContext;
 import net.cargal.littlecalc.LittleCalcParser.TreeUtilContext;
 
 public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
@@ -99,6 +101,17 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         if (parser != null) {
             var content = ctx.stmts() == null ? ctx.antlrUtil() : ctx.stmts();
             System.out.println(content.toStringTree(parser));
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitTokensUtil(TokensUtilContext ctx) {
+        TokenStream tokenStream = parser.getTokenStream();
+        var content = ctx.stmts() == null ? ctx.antlrUtil() : ctx.stmts();
+        Interval sourceInterval = content.getSourceInterval();
+        for (int i = sourceInterval.a; i <= sourceInterval.b; i++) {
+            System.out.println(tokenStream.get(i));
         }
         return null;
     }

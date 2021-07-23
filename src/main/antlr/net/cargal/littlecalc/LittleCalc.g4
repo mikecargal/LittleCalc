@@ -19,6 +19,7 @@ antlrUtil
     : TREE '{' (stmts | antlrUtil) '}'     # TreeUtil
     | GUI '{' (stmts | antlrUtil) '}'      # GUIUtil
     | REFACTOR '{' (stmts | antlrUtil) '}' # RefactorUtil
+    | TOKENS '{' (stmts | antlrUtil) '}'   # TokensUtil
     ;
 
 expr

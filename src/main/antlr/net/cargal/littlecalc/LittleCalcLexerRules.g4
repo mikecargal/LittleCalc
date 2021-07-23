@@ -28,6 +28,7 @@ VARS: V A R S; // another way to handle case insensitivity
 GUI:      'gui';
 TREE:     'tree';
 REFACTOR: 'refactor';
+TOKENS:   'tokens';
 
 // Symbol Tokens
 O_PAREN: '(';
