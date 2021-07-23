@@ -31,6 +31,16 @@
             "startRule": "calcIn",
             "printParseTree": true,
             "visualParseTree": true
+        },
+        {
+            "name": "antlr4-littleCalcExpr",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "${workspaceFolder}/expr.ltl",
+            "grammar": "${workspaceFolder}/src/main/antlr/net/cargal/littlecalc/LittleCalc.g4",
+            "startRule": "expr",
+            "printParseTree": true,
+            "visualParseTree": true
         }
     ]
 }
