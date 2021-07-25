@@ -2,33 +2,8 @@ lexer grammar LittleCalcLexerRules
     ;
 
 // keywords
-IF:     'if';
-ELSE:   'else';
-ASSIGN: '=';
-EQ:     '==';
-NE:     '!=';
-LT:     '<';
-LE:     '<=';
-GT:     '>';
-GE:     '>=';
-NOT:    '!';
-AND:    '&&';
-OR:     '||';
-
-TRUE:  'true';
-FALSE: 'false';
-
-PRINT
-    : [Pp][Rr][Ii][Nn][Tt]
-    ; // one way to handle case-insenstive
-
-VARS: V A R S; // another way to handle case insensitivity
-
-//  ANTLR Util commands
-GUI:      'gui';
-TREE:     'tree';
-REFACTOR: 'refactor';
-TOKENS:   'tokens';
+// IF:    I F;
+// ELSE:  E L S E;
 
 // Symbol Tokens
 O_PAREN: '(';
@@ -42,12 +17,35 @@ ADD:     '+';
 SUB:     '-';
 COLON:   ':';
 QMARK:   '?';
+ASSIGN: '=';
+EQ:     '==';
+NE:     '!=';
+LT:     '<';
+LE:     '<=';
+GT:     '>';
+GE:     '>=';
+NOT:    '!';
+AND:    '&&';
+OR:     '||';
+
+TRUE: T R U E;
+FALSE: F A L S E;
+
+PRINT: P R I N T; 
+VARS: V A R S; 
+
+//  ANTLR Util commands
+GUI:      G U I;
+TREE:     T R E E;
+REFACTOR: R E F A C T O R;
+TOKENS:   T O K E N S;
 
 fragment DIGIT: [0-9];
 fragment ALPHA: [a-zA-Z];
 NUMBER:         (DIGIT | '_')+ ('.' (DIGIT | '_')+)?;
-STRING:         '"' ('\\"' | '\\\'' | .)*? '"';
-S_STRING:       '\'' ('\\"' | '\\\'' | .)*? '\'' -> type(STRING);
+fragment STRING_CONTENT: ('\\"' | '\\\'' | .);
+STRING:         '"' STRING_CONTENT*? '"';
+S_STRING:       '\'' STRING_CONTENT*? '\'' -> type(STRING);
 ID:             (ALPHA | '_') (ALPHA | DIGIT | '_')*;
 COMMENT:        '//' .*? ('\n' | EOF) -> channel(HIDDEN);
 WS:             [ \t\r\n]+            -> channel(HIDDEN);

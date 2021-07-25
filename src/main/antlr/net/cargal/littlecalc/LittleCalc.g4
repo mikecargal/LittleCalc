@@ -27,11 +27,11 @@ expr
     | <assoc = right> base = expr '^' exp = expr     # ExpExpr
     | lhs = expr op = ('*' | '/') rhs = expr         # MulDivExpr
     | lhs = expr op = ('+' | '-') rhs = expr         # AddSubExpr
-    | lhs = expr op = (LT | LE | GE | GT) rhs = expr # CompareExpr
-    | lhs = expr op = (EQ | NE) rhs = expr           # EqualityExpr
+    | lhs = expr op = ('<' | '<=' | '>=' | '>') rhs = expr # CompareExpr
+    | lhs = expr op = ('==' | '!=') rhs = expr           # EqualityExpr
     | cond = expr '?' tv = expr ':' fv = expr        # ternaryExpr
-    | lhs = expr AND rhs = expr                      # andExpr
-    | lhs = expr OR rhs = expr                       # orExpr
+    | lhs = expr '&&' rhs = expr                      # andExpr
+    | lhs = expr '||' rhs = expr                       # orExpr
     | '!' expr                                       # negationExpr
     | NUMBER                                         # NumberExpr
     | TRUE                                           # TrueExpr
