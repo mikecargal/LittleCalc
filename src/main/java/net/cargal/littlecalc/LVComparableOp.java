@@ -7,7 +7,7 @@ import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 public enum LVComparableOp {
     LT("<"), LE("<="), GT(">"), GE(">=");
 
-    private String text;
+    private final String text;
 
     LVComparableOp(String text) {
         this.text = text;
@@ -22,17 +22,12 @@ public enum LVComparableOp {
     }
 
     public static LVComparableOp fromTokenType(int tokenType) {
-        switch (tokenType) {
-            case LittleCalcLexer.LT:
-                return LT;
-            case LittleCalcLexer.LE:
-                return LE;
-            case LittleCalcLexer.GT:
-                return GT;
-            case LittleCalcLexer.GE:
-                return GE;
-            default:
-                throw new LittleCalcImplementationException("Invalid Comparable Op (" + tokenType + ")");
-        }
+        return switch (tokenType) {
+            case LittleCalcLexer.LT -> LT;
+            case LittleCalcLexer.LE -> LE;
+            case LittleCalcLexer.GT -> GT;
+            case LittleCalcLexer.GE -> GE;
+            default -> throw new LittleCalcImplementationException("Invalid Comparable Op (" + tokenType + ")");
+        };
     }
 }

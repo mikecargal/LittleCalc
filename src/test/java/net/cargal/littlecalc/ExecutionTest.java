@@ -81,11 +81,10 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void testParenExpr() throws Exception {
+    void testParenExpr() {
         interpret(LittleCalcParser::calcIn, """
                 x = 8 * (5 + 6)
                 """);
-        ;
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(88.0, visitor.getVar("x").get().number());
     }
@@ -176,7 +175,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void testreset() {
+    void testReset() {
         interpret(LittleCalcParser::calcIn, """
                 a = 1 < "3"
                 """);
@@ -214,20 +213,19 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void testNoValue() throws Exception {
+    void testNoValue() {
         interpret(LittleCalcParser::calcIn, """
                 a = b
                 """);
         assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
 
-        var ex = assertThrows(LittleCalcRuntimeException.class, () -> {
-            new LittleCalcExecutionVisitor().visit(parseTree);
-        });
+        var ex = assertThrows(LittleCalcRuntimeException.class, //
+                 () -> new LittleCalcExecutionVisitor().visit(parseTree));
         assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage().trim());
     }
 
     @Test
-    void testEquatlity() {
+    void testEquality() {
         interpret(LittleCalcParser::calcIn, """
                 a = 2 == 2
                 b = 2 != 2

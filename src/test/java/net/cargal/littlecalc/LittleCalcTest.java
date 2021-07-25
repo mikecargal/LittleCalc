@@ -53,7 +53,7 @@ class LittleCalcTest {
                 """;
 
         var expected = """
-                \"nope\" is not numeric
+                "nope" is not numeric
                 """;
         verifyRun(source, expected);
     }
@@ -71,9 +71,7 @@ class LittleCalcTest {
     }
 
     private void verifyRun(String source, String expected) throws Exception {
-        capturedOutput = tapSystemErrAndOutNormalized(() -> {
-            lc.run(CharStreams.fromString(source));
-        });
+        capturedOutput = tapSystemErrAndOutNormalized(() -> lc.run(CharStreams.fromString(source)));
         assertMatchedOutput(expected);
     }
 

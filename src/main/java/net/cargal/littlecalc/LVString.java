@@ -1,7 +1,7 @@
 package net.cargal.littlecalc;
 
 public class LVString extends LittleValue {
-    private String value;
+    private final String value;
 
     public LVString(String value, int line, int column) {
         super(line, column);
@@ -37,7 +37,7 @@ public class LVString extends LittleValue {
     public boolean equals(Object obj) {
         if (!(obj instanceof LVString))
             return false;
-        return string() == ((LittleValue) obj).string();
+        return string().equals(((LittleValue) obj).string());
     }
 
     @Override

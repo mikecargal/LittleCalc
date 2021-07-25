@@ -30,8 +30,8 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     private ParseTreePattern neFalsePattern;
     private ParseTreePattern plus0Pattern;
     private ParseTreePattern times1Pattern;
-    protected SymbolTable<LittleValue> variables = new SymbolTable<>();
-    protected LittleCalcExprVisitor exprVisitor;
+    protected final SymbolTable<LittleValue> variables = new SymbolTable<>();
+    protected final LittleCalcExprVisitor exprVisitor;
     private static final String FULL_TRACING_CMD = "fullTracing";
     private static final String LEXER_TRACING_CMD = "lexerTracing";
     private static final String PARSER_TRACING_CMD = "parserTracing";

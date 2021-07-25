@@ -26,7 +26,7 @@ public class TracingTokenFactoryTest {
     }
 
     @Test
-    void testSimpleCreat() throws Exception {
+    void testSimpleCreate() throws Exception {
         var expectedTokenString = "[@-1,0:0='9',<" + LittleCalcLexer.NUMBER + ">,0:-1]";
         var capturedOutput = tapSystemErrAndOutNormalized(() -> {
             CommonToken symbol = TracingTokenFactory.DEFAULT.create(LittleCalcLexer.NUMBER, "9");

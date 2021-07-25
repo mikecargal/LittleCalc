@@ -1,11 +1,6 @@
 package net.cargal.littlecalc;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -19,10 +14,10 @@ import net.cargal.littlecalc.LittleCalcParser.OrExprContext;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener {
-    protected List<String> errorMessages = new ArrayList<>();
+    protected final List<String> errorMessages = new ArrayList<>();
 
-    protected Map<String, LVType> variables = new HashMap<>();
-    protected Deque<LVType> typeStack = new ArrayDeque<>();
+    protected final Map<String, LVType> variables = new HashMap<>();
+    protected final Deque<LVType> typeStack = new ArrayDeque<>();
     protected int utilLevel = 0;
 
     @Override
@@ -38,11 +33,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     public void exitIDExpr(LittleCalcParser.IDExprContext ctx) {
         var idVal = variables.get(ctx.ID().getText());
         assertion(idVal != null, () -> ctx.ID().getText() + " has not been assigned a value", ctx);
-        if (idVal == null) {
-            typeStack.push(LVUnknownType.INSTANCE);
-        } else {
-            typeStack.push(idVal);
-        }
+        typeStack.push(Objects.requireNonNullElse(idVal, LVUnknownType.INSTANCE));
     }
 
     @Override
@@ -162,17 +153,17 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     }
 
     private void assertNumberType(LVType type, ParserRuleContext ctx) {
-        if (!validating()) return;
+        if (skippingValidation()) return;
         assertion(type instanceof LVNumberType, () -> ctx.getText() + " is not numeric", ctx);
     }
 
     private void assertBooleanType(LVType type, ParserRuleContext ctx) {
-        if (!validating()) return;
+        if (skippingValidation()) return;
         assertion(type instanceof LVBooleanType, () -> ctx.getText() + " is not boolean", ctx);
     }
 
     private void assertion(boolean condition, Supplier<String> messageSupplier, ParserRuleContext ctx) {
-        if (!validating()) return;
+        if (skippingValidation()) return;
         if (!condition) {
             Token tk = ctx.getStart();
             var msg = LittleCalcRuntimeException.message(messageSupplier.get(), tk.getLine(),
@@ -182,8 +173,8 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
         }
     }
 
-    private boolean validating() {
-        return utilLevel == 0;
+    private boolean skippingValidation() {
+        return utilLevel != 0;
     }
 
 }

@@ -9,8 +9,8 @@ import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public abstract class LittleValue implements Comparable<LittleValue> {
 
-    protected int line;
-    protected int column;
+    protected final int line;
+    protected final int column;
 
     public int getLine() {
         return line;
@@ -37,7 +37,7 @@ public abstract class LittleValue implements Comparable<LittleValue> {
 
     static LittleValue booleanValue(boolean bv, ParserRuleContext ctx) {
         Token tk = ctx.getStart();
-        return new LVBoolean(Boolean.valueOf(bv), tk.getLine(), tk.getCharPositionInLine());
+        return new LVBoolean(bv, tk.getLine(), tk.getCharPositionInLine());
     }
 
     static LittleValue numberValue(Double dv, int line, int column) {
@@ -49,7 +49,7 @@ public abstract class LittleValue implements Comparable<LittleValue> {
     }
 
     static LittleValue booleanValue(boolean bv, int line, int column) {
-        return new LVBoolean(Boolean.valueOf(bv), line, column);
+        return new LVBoolean(bv, line, column);
     }
 
     public boolean isBoolean() {
@@ -99,7 +99,7 @@ public abstract class LittleValue implements Comparable<LittleValue> {
     }
 
     public boolean evalEquality(LVEquatableOp op, LittleValue rhs) {
-        return ((op == LVEquatableOp.EQ) ? equals(rhs) : !equals(rhs));
+        return ((op == LVEquatableOp.EQ) == equals(rhs));
     }
 
     private void assertion(boolean condition, Supplier<String> messageSupplier) {

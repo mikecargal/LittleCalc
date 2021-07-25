@@ -1,7 +1,7 @@
 package net.cargal.littlecalc;
 
 public class LVNumber extends LittleValue {
-    private Double value;
+    private final Double value;
 
     public LVNumber(Double value, int line, int column) {
         super(line, column);

@@ -4,7 +4,7 @@ import net.cargal.littlecalc.exceptions.LittleCalcImplementationException;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LVBoolean extends LittleValue {
-    private Boolean value;
+    private final Boolean value;
 
     public LVBoolean(Boolean value, int line, int column) {
         super(line, column);

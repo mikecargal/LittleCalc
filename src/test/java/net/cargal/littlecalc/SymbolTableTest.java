@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +17,6 @@ public class SymbolTableTest {
 
     SymbolTable<LittleValue> root;
     SymbolTable<LittleValue> child;
-    ParserRuleContext mockContext;
     LittleValue lvPA;
     LittleValue lvA;
     LittleValue lvB;

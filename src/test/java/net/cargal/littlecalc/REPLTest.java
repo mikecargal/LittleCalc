@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 public class REPLTest extends LCTestBase {
 
     private LittleCalcRepl repl;
-    private String capturedOutput;
 
     @BeforeEach
     void before() {
@@ -59,7 +58,7 @@ public class REPLTest extends LCTestBase {
     }
 
     @Test
-    void testREPLSessionwithContinuation() throws Exception {
+    void testREPLSessionWithContinuation() throws Exception {
         var source = """
                 7 +
                 8
@@ -257,9 +256,7 @@ public class REPLTest extends LCTestBase {
         var pair = prep(source, expected);
         var preppedSource = pair.a;
         var preppedExpected = pair.b;
-        capturedOutput = tapSystemErrAndOutNormalized(() -> {
-            repl.run(getTerminal(preppedSource));
-        });
+        String capturedOutput = tapSystemErrAndOutNormalized(() -> repl.run(getTerminal(preppedSource)));
         assertMatchedOutput(preppedExpected, capturedOutput);
     }
 

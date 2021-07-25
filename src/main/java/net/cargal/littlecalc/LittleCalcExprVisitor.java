@@ -24,7 +24,7 @@ import net.cargal.littlecalc.LittleCalcParser.TrueExprContext;
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
 public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
-    private SymbolTable<LittleValue> variables;
+    private final SymbolTable<LittleValue> variables;
 
     public LittleCalcExprVisitor(SymbolTable<LittleValue> variables) {
         this.variables = variables;

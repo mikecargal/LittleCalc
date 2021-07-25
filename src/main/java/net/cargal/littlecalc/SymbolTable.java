@@ -6,13 +6,15 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class SymbolTable<T> {
-    private Map<String, T> symbols = new HashMap<>();
-    private Optional<SymbolTable<T>> parent;
+    private final Map<String, T> symbols = new HashMap<>();
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<SymbolTable<T>> parent;
 
     public SymbolTable() {
         this(null);
     }
 
+    @SuppressWarnings("CopyConstructorMissesField")
     public SymbolTable(SymbolTable<T> parent) {
         this.parent = Optional.ofNullable(parent);
     }
