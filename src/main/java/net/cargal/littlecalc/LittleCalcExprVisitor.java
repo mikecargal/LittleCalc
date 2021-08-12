@@ -30,6 +30,7 @@ public class LittleCalcExprVisitor extends LittleCalcBaseVisitor<LittleValue> {
         this.variables = variables;
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public LittleValue visitIDExpr(IDExprContext ctx) {
         var idVal = variables.get(ctx.ID().getText());

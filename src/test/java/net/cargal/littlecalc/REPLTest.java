@@ -197,21 +197,21 @@ public class REPLTest extends LCTestBase {
         var source = """
                 s = false
                 t = 9 == 27 / 3
-                refactor { 
-                    print s == true 
+                refactor {
+                    print s == true
                     print t == true
                 }
                 """;
         var expected = """
                 s = false
                 t = 9 == 27 / 3
-                refactor { 
-                    print s == true 
+                refactor {
+                    print s == true
                     print t == true
                 }
                 
-                print s 
-                print t 
+                print s
+                print t
                 """;
         verifyRun(source, expected);
     }
@@ -225,7 +225,7 @@ public class REPLTest extends LCTestBase {
                 """;
         var expected = """
                 tree {
-                    5 
+                    5
                 }
                 (expr 5)
                 """;

@@ -14,7 +14,6 @@ public class SymbolTable<T> {
         this(null);
     }
 
-    @SuppressWarnings("CopyConstructorMissesField")
     public SymbolTable(SymbolTable<T> parent) {
         this.parent = Optional.ofNullable(parent);
     }

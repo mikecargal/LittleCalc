@@ -185,6 +185,7 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     public void dumpVariables() {
+        //noinspection OptionalGetWithoutIsPresent
         variables.keyStream().forEach(key -> System.out.println("\t" + key + " : " + variables.get(key).get()));
     }
 

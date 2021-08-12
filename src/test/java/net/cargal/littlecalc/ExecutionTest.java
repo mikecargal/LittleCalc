@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import net.cargal.littlecalc.exceptions.LittleCalcRuntimeException;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class ExecutionTest extends LCTestBase {
 
     private LittleCalcSemanticValidationListener listener;

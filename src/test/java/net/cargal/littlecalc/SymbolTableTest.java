@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class SymbolTableTest {
     private static final String PARENT_AAA = "ParentAAA";
     private static final String AAA = "AAA";
