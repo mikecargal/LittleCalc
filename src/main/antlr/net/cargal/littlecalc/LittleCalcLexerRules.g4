@@ -1,10 +1,6 @@
 lexer grammar LittleCalcLexerRules
     ;
 
-// keywords
-// IF:    I F;
-// ELSE:  E L S E;
-
 // Symbol Tokens
 O_PAREN: '(';
 C_PAREN: ')';
