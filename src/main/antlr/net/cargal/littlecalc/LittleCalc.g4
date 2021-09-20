@@ -23,19 +23,19 @@ antlrUtil
     ;
 
 expr
-    : '(' expr ')'                                   # ParenExpr
-    | <assoc = right> base = expr '^' exp = expr     # ExpExpr
-    | lhs = expr op = ('*' | '/') rhs = expr         # MulDivExpr
-    | lhs = expr op = ('+' | '-') rhs = expr         # AddSubExpr
+    : '(' expr ')'                                         # ParenExpr
+    | <assoc = right> base = expr '^' exp = expr           # ExpExpr
+    | lhs = expr op = ('*' | '/') rhs = expr               # MulDivExpr
+    | lhs = expr op = ('+' | '-') rhs = expr               # AddSubExpr
     | lhs = expr op = ('<' | '<=' | '>=' | '>') rhs = expr # CompareExpr
-    | lhs = expr op = ('==' | '!=') rhs = expr           # EqualityExpr
-    | cond = expr '?' tv = expr ':' fv = expr        # ternaryExpr
-    | lhs = expr '&&' rhs = expr                      # andExpr
-    | lhs = expr '||' rhs = expr                       # orExpr
-    | '!' expr                                       # negationExpr
-    | NUMBER                                         # NumberExpr
-    | TRUE                                           # TrueExpr
-    | FALSE                                          # FalseExpr
-    | STRING                                         # StringExpr
-    | ID                                             # IDExpr
+    | lhs = expr op = ('==' | '!=') rhs = expr             # EqualityExpr
+    | cond = expr '?' tv = expr ':' fv = expr              # ternaryExpr
+    | lhs = expr '&&' rhs = expr                           # andExpr
+    | lhs = expr '||' rhs = expr                           # orExpr
+    | '!' expr                                             # negationExpr
+    | NUMBER                                               # NumberExpr
+    | TRUE                                                 # TrueExpr
+    | FALSE                                                # FalseExpr
+    | STRING                                               # StringExpr
+    | ID                                                   # IDExpr
     ;
