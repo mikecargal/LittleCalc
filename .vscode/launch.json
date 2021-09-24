@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch LittleCalcSmokeTest",
+            "request": "launch",
+            "mainClass": "net.cargal.littlecalc.LittleCalcSmokeTest",
+            "projectName": "LittleCalc"
+        },
+        {
+            "type": "java",
             "name": "Launch LittleCalc",
             "request": "launch",
             "mainClass": "net.cargal.littlecalc.LittleCalc",

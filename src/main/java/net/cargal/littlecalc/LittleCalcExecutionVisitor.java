@@ -28,8 +28,12 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     private ParseTreePattern eqFalsePattern;
     private ParseTreePattern neTruePattern;
     private ParseTreePattern neFalsePattern;
-    private ParseTreePattern plus0Pattern;
-    private ParseTreePattern times1Pattern;
+    private ParseTreePattern plus0PatternA;
+    private ParseTreePattern plus0PatternB;
+    private ParseTreePattern times1PatternA;
+    private ParseTreePattern times1PatternB;
+    private ParseTreePattern times0PatternA;
+    private ParseTreePattern times0PatternB;
     protected final SymbolTable<LittleValue> variables = new SymbolTable<>();
     protected final LittleCalcExprVisitor exprVisitor;
     private static final String FULL_TRACING_CMD = "fullTracing";
@@ -48,8 +52,12 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         neTruePattern = parser.compileParseTreePattern("<expr> != <TRUE>", exprRule);
         eqFalsePattern = parser.compileParseTreePattern("<expr> == <FALSE>", exprRule);
         neFalsePattern = parser.compileParseTreePattern("<expr> != <FALSE>", exprRule);
-        plus0Pattern = parser.compileParseTreePattern("<expr> + 0", exprRule);
-        times1Pattern = parser.compileParseTreePattern("<expr> * 1", exprRule);
+        plus0PatternA = parser.compileParseTreePattern("<expr> + 0", exprRule);
+        plus0PatternB = parser.compileParseTreePattern("0 + <expr>", exprRule);
+        times1PatternA = parser.compileParseTreePattern("<expr> * 1", exprRule);
+        times1PatternB = parser.compileParseTreePattern("1 * <expr>", exprRule);
+        times0PatternA = parser.compileParseTreePattern("<expr> * 0", exprRule);
+        times0PatternB = parser.compileParseTreePattern("0 * <expr>", exprRule);
         resetRefactoring();
     }
 
@@ -129,6 +137,7 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
         neFalse(ctx, pName);
         plus0(ctx, pName);
         times1(ctx, pName);
+        times0(ctx, pName);
 
         System.out.println(rewriter.getText(pName, contentInterval));
         return null;
@@ -165,16 +174,36 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     private void plus0(RefactorUtilContext ctx, String pName) {
-        for (var match : plus0Pattern.findAll(ctx, ANY_EXPR_XPATH)) {
+        for (var match : plus0PatternA.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (AddSubExprContext) (match.getTree());
             rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
+        }
+        for (var match : plus0PatternB.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (AddSubExprContext) (match.getTree());
+            rewriter.delete(pName, matchCtx.lhs.getStart(), matchCtx.op);
         }
     }
 
     private void times1(RefactorUtilContext ctx, String pName) {
-        for (var match : times1Pattern.findAll(ctx, ANY_EXPR_XPATH)) {
+        for (var match : times1PatternA.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (MulDivExprContext) (match.getTree());
             rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
+        }
+        for (var match : times1PatternB.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (MulDivExprContext) (match.getTree());
+            rewriter.delete(pName, matchCtx.lhs.getStart(), matchCtx.op);
+        }
+    }
+
+
+    private void times0(RefactorUtilContext ctx, String pName) {
+        for (var match : times0PatternA.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (MulDivExprContext) (match.getTree());
+            rewriter.replace(pName, matchCtx.lhs.getStart(), matchCtx.rhs.getStop(),0);
+        }
+        for (var match : times0PatternB.findAll(ctx, ANY_EXPR_XPATH)) {
+            var matchCtx = (MulDivExprContext) (match.getTree());
+            rewriter.replace(pName, matchCtx.rhs.getStart(), matchCtx.rhs.getStop(),0);
         }
     }
 
@@ -185,7 +214,7 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     }
 
     public void dumpVariables() {
-        //noinspection OptionalGetWithoutIsPresent
+        // noinspection OptionalGetWithoutIsPresent
         variables.keyStream().forEach(key -> System.out.println("\t" + key + " : " + variables.get(key).get()));
     }
 
