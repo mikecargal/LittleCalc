@@ -30,7 +30,7 @@
             "projectName": "LittleCalc"
         },
         {
-            "name": "antlr4-littleCalcRepl",
+            "name": "a4-littleCalc little.ltl",
             "type": "antlr-debug",
             "request": "launch",
             "input": "${workspaceFolder}/little.ltl",
@@ -40,7 +40,7 @@
             "visualParseTree": true
         },
         {
-            "name": "antlr4-littleCalcExpr",
+            "name": "a4-littleCalc expr.ltl",
             "type": "antlr-debug",
             "request": "launch",
             "input": "${workspaceFolder}/expr.ltl",
