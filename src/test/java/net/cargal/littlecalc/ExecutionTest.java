@@ -221,7 +221,7 @@ public class ExecutionTest extends LCTestBase {
         assertEquals("line:1 col:5 -- b has not been assigned a value", capturedOutput.trim());
 
         var ex = assertThrows(LittleCalcRuntimeException.class, //
-                 () -> new LittleCalcExecutionVisitor().visit(parseTree));
+                () -> new LittleCalcExecutionVisitor().visit(parseTree));
         assertEquals("line:1 col:5 -- b has not been assigned a value", ex.getMessage().trim());
     }
 
@@ -282,7 +282,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestParseError() {
+    void testParseError() {
         interpret(LittleCalcParser::calcIn, """
                 mike = 10
                 print 8 * 9 ^ / (mike / 6)
@@ -296,7 +296,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestEQTrueRefactor() {
+    void testEQTrueRefactor() {
         interpret(LittleCalcParser::replIn, """
                     refactor { a == true }
                 """);
@@ -304,7 +304,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestNETrueRefactor() {
+    void testNETrueRefactor() {
         interpret(LittleCalcParser::replIn, """
                     refactor { a != true }
                 """);
@@ -312,7 +312,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestEQFalseRefactor() {
+    void testEQFalseRefactor() {
         interpret(LittleCalcParser::replIn, """
                 refactor { a == false }
                 """);
@@ -320,7 +320,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestNEFalseRefactor() {
+    void testNEFalseRefactor() {
         interpret(LittleCalcParser::replIn, """
                 refactor { a != false }
                 """);
@@ -328,7 +328,7 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestPlus0Refactor() {
+    void testPlus0Refactor() {
         interpret(LittleCalcParser::replIn, """
                     refactor { a + 0 - 5 }
                 """);
@@ -336,11 +336,62 @@ public class ExecutionTest extends LCTestBase {
     }
 
     @Test
-    void TestTimes1Refactor() {
+    void test0PlusRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { 0 + a - 5 }
+                """);
+        assertMatchedOutput(" a - 5 ", capturedOutput);
+    }
+
+    @Test
+    void testTimes1Refactor() {
         interpret(LittleCalcParser::replIn, """
                     refactor { a * 1 - 5 }
                 """);
         assertMatchedOutput(" a  - 5 ", capturedOutput);
+    }
+
+    @Test
+    void test1TimesRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { 1 * a - 5 }
+                """);
+        assertMatchedOutput(" a - 5 ", capturedOutput);
+    }
+
+    @Test
+    void testTimes0Refactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { a * 0 - 5 }
+                """);
+        assertMatchedOutput(" 0 - 5 ", capturedOutput);
+    }
+
+    @Test
+    void test0TimesRefactor() {
+        interpret(LittleCalcParser::replIn, """
+                    refactor { 0 * a - 5 }
+                """);
+        assertMatchedOutput(" 0 - 5 ", capturedOutput);
+    }
+
+    @Test
+    void testVisistTokens() {
+        interpret(LittleCalcParser::replIn, """
+                    tokens { 0 * a - 5 }
+                """);
+        var expected = """
+                [@5,13:13='0',<30>,1:13]
+                [@6,14:14=' ',<34>,channel=1,1:14]
+                [@7,15:15='*',<6>,1:15]
+                [@8,16:16=' ',<34>,channel=1,1:16]
+                [@9,17:17='a',<32>,1:17]
+                [@10,18:18=' ',<34>,channel=1,1:18]
+                [@11,19:19='-',<9>,1:19]
+                [@12,20:20=' ',<34>,channel=1,1:20]
+                [@13,21:21='5',<30>,1:21]
+                """;
+        assertMatchedOutput(expected, capturedOutput);
     }
 
 }
