@@ -38,7 +38,7 @@ TOKENS:   T O K E N S;
 
 fragment DIGIT: [0-9];
 fragment ALPHA: [a-zA-Z];
-NUMBER:         (DIGIT | '_')+ ('.' (DIGIT | '_')+)?;
+NUMBER:         DIGIT (DIGIT | '_')* ('.' (DIGIT | '_')+)?;
 fragment STRING_CONTENT: ('\\"' | '\\\'' | .);
 STRING:         '"' STRING_CONTENT*? '"';
 S_STRING:       '\'' STRING_CONTENT*? '\'' -> type(STRING);
