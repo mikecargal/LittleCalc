@@ -55,9 +55,9 @@ public class LittleCalcRepl {
     }
 
     private void initParser() {
-        lexer = new LittleCalcLexer(CharStreams.fromString(""));
+        lexer = new LCStateTraceLexer(CharStreams.fromString(""));
         tokenStream = new CommonTokenStream(lexer);
-        parser = new LittleCalcParser(tokenStream);
+        parser = new LCStateTraceParser(tokenStream);
         listener = new LittleCalcSemanticValidationListener();
         replVisitor = new LittleCalcExecutionVisitor(parser);
 
@@ -75,6 +75,11 @@ public class LittleCalcRepl {
         if (replErrListener.completeInput()) {
             result = "";
             if (parser.getNumberOfSyntaxErrors() == 0) {
+                // System.out.println(replTree //
+                // .getChild(0) //
+                // .getChild(0) //
+                // .getChild(0) //
+                // .getClass().getSimpleName());
                 ParseTreeWalker.DEFAULT.walk(listener, replTree);
                 if (!listener.hasErrors()) {
                     replVisitor.visit(replTree);

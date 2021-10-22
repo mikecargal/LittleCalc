@@ -1,5 +1,10 @@
 grammar LittleCalc
     ;
+
+options {
+    contextSuperClass = net .cargal .littlecalc .LCAltNumCtx;
+}
+
 import LittleCalcLexerRules
     ;
 

@@ -38,6 +38,7 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
 
     @Override
     public void exitMulDivExpr(LittleCalcParser.MulDivExprContext ctx) {
+
         var rhs = typeStack.pop();
         var lhs = typeStack.pop();
 
@@ -153,17 +154,20 @@ public class LittleCalcSemanticValidationListener extends LittleCalcBaseListener
     }
 
     private void assertNumberType(LVType type, ParserRuleContext ctx) {
-        if (skippingValidation()) return;
+        if (skippingValidation())
+            return;
         assertion(type instanceof LVNumberType, () -> ctx.getText() + " is not numeric", ctx);
     }
 
     private void assertBooleanType(LVType type, ParserRuleContext ctx) {
-        if (skippingValidation()) return;
+        if (skippingValidation())
+            return;
         assertion(type instanceof LVBooleanType, () -> ctx.getText() + " is not boolean", ctx);
     }
 
     private void assertion(boolean condition, Supplier<String> messageSupplier, ParserRuleContext ctx) {
-        if (skippingValidation()) return;
+        if (skippingValidation())
+            return;
         if (!condition) {
             Token tk = ctx.getStart();
             var msg = LittleCalcRuntimeException.message(messageSupplier.get(), tk.getLine(),

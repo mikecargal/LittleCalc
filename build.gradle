@@ -16,10 +16,11 @@ plugins {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
-    antlr "org.antlr:antlr4:4.9.2"
+    antlr "org.antlr:antlr4:4.9.3-SNAPSHOT"
     
     implementation 'org.tinylog:tinylog-api:2.4.0-M1'
     implementation 'org.tinylog:tinylog-impl:2.4.0-M1'
