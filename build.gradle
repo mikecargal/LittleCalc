@@ -12,6 +12,7 @@ plugins {
     id 'antlr'
     id 'jacoco'
     id 'java'
+ //   id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
 repositories {
@@ -56,15 +57,48 @@ application {
 }
 
 task(smokeTest, dependsOn: 'classes', type: JavaExec) {
-    main = 'net.cargal.littlecalc.LittleCalcSmokeTest'
+    mainClass = 'net.cargal.littlecalc.LittleCalcSmokeTest'
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task(repl, dependsOn: 'classes', type: JavaExec) {
-    main = 'net.cargal.littlecalc.LittleCalcRepl'
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
+// Note, when run from Gradle task, gradle won't create a system terminal
+// so this task hangs... leaving comment in case that is ever addressed
+// task(repl, dependsOn: 'classes', type: JavaExec) {
+//     mainClass = 'net.cargal.littlecalc.LittleCalcRepl'
+//     classpath = sourceSets.main.runtimeClasspath
+//     standardInput = System.in
+// }
+
+task(replJar,dependsOn: test,type:Jar) {
+    manifest {
+        attributes(
+                'Main-Class': 'net.cargal.littlecalc.LittleCalcRepl'
+        )
+    }
+    archiveBaseName = 'littlecalc-repl'
+    from sourceSets.main.output
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+build.finalizedBy(replJar)
+
+task(interpJar,dependsOn: test,type:Jar) {
+    manifest {
+        attributes(
+                'Main-Class': 'net.cargal.littlecalc.LittleCalc'
+        )
+    }
+    archiveBaseName = 'littlecalc-interp'
+    from sourceSets.main.output
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+build.finalizedBy(interpJar)
 
 jacoco {
     toolVersion = "0.8.7"
@@ -93,6 +127,5 @@ jacocoTestReport {
             .filter({file -> !file.path.contains('LittleCalcBaseVisitor')})
         }))
     }
-
 }
 
