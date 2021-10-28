@@ -23,6 +23,18 @@ import net.cargal.littlecalc.LittleCalcParser.TokensUtilContext;
 import net.cargal.littlecalc.LittleCalcParser.TreeUtilContext;
 
 public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
+    protected final LittleCalcExprVisitor exprVisitor;
+
+    protected final SymbolTable<LittleValue> variables = new SymbolTable<>();
+    private Parser parser;
+    private TokenStreamRewriter rewriter;
+
+    private static final String FULL_TRACING_CMD = "fullTracing";
+    private static final String LEXER_TRACING_CMD = "lexerTracing";
+    private static final String PARSER_TRACING_CMD = "parserTracing";
+    private boolean parserTracing = false;
+    private boolean lexerTracing = false;
+
     private static final String ANY_EXPR_XPATH = "//expr";
     private ParseTreePattern eqTruePattern;
     private ParseTreePattern eqFalsePattern;
@@ -34,15 +46,6 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     private ParseTreePattern times1PatternB;
     private ParseTreePattern times0PatternA;
     private ParseTreePattern times0PatternB;
-    protected final SymbolTable<LittleValue> variables = new SymbolTable<>();
-    protected final LittleCalcExprVisitor exprVisitor;
-    private static final String FULL_TRACING_CMD = "fullTracing";
-    private static final String LEXER_TRACING_CMD = "lexerTracing";
-    private static final String PARSER_TRACING_CMD = "parserTracing";
-    private boolean parserTracing = false;
-    private boolean lexerTracing = false;
-    private Parser parser;
-    private TokenStreamRewriter rewriter;
 
     public LittleCalcExecutionVisitor(Parser parser) {
         this();
