@@ -187,24 +187,26 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     private void times1(RefactorUtilContext ctx, String pName) {
         for (var match : times1PatternA.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (MulDivExprContext) (match.getTree());
-            rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
+            // rewriter.delete(pName, matchCtx.op, matchCtx.rhs.getStop());
+            rewriter.insertBefore(pName, matchCtx.op, "/* ");
+            rewriter.insertAfter(pName, matchCtx.rhs.getStart(), " */");
         }
         for (var match : times1PatternB.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (MulDivExprContext) (match.getTree());
-            rewriter.delete(pName, matchCtx.lhs.getStart(), matchCtx.op);
-            // rewriter.insertBefore(pName, matchCtx.lhs.getStart(), "/* ");
-            // rewriter.insertAfter(pName, matchCtx.op, " */");
+            // rewriter.delete(pName, matchCtx.lhs.getStart(), matchCtx.op);
+            rewriter.insertBefore(pName, matchCtx.lhs.getStart(), "/* ");
+            rewriter.insertAfter(pName, matchCtx.op, " */");
         }
     }
 
     private void times0(RefactorUtilContext ctx, String pName) {
         for (var match : times0PatternA.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (MulDivExprContext) (match.getTree());
-            rewriter.replace(pName, matchCtx.lhs.getStart(), matchCtx.rhs.getStop(), 0);
+            rewriter.replace(pName, matchCtx.lhs.getStart(), matchCtx.rhs.getStop(), "0");
         }
         for (var match : times0PatternB.findAll(ctx, ANY_EXPR_XPATH)) {
             var matchCtx = (MulDivExprContext) (match.getTree());
-            rewriter.replace(pName, matchCtx.rhs.getStart(), matchCtx.rhs.getStop(), 0);
+            rewriter.replace(pName, matchCtx.rhs.getStart(), matchCtx.rhs.getStop(), "0");
         }
     }
 
