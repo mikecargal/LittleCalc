@@ -50,17 +50,16 @@ public class LittleCalcExecutionVisitor extends LittleCalcBaseVisitor<Void> {
     public LittleCalcExecutionVisitor(Parser parser) {
         this();
         this.parser = parser;
-        var exprRule = LittleCalcParser.RULE_expr;
-        eqTruePattern = parser.compileParseTreePattern("<expr> == <TRUE>", exprRule);
-        neTruePattern = parser.compileParseTreePattern("<expr> != <TRUE>", exprRule);
-        eqFalsePattern = parser.compileParseTreePattern("<expr> == <FALSE>", exprRule);
-        neFalsePattern = parser.compileParseTreePattern("<expr> != <FALSE>", exprRule);
-        plus0PatternA = parser.compileParseTreePattern("<expr> + 0", exprRule);
-        plus0PatternB = parser.compileParseTreePattern("0 + <expr>", exprRule);
-        times1PatternA = parser.compileParseTreePattern("<expr> * 1", exprRule);
-        times1PatternB = parser.compileParseTreePattern("1 * <expr>", exprRule);
-        times0PatternA = parser.compileParseTreePattern("<expr> * 0", exprRule);
-        times0PatternB = parser.compileParseTreePattern("0 * <expr>", exprRule);
+        eqTruePattern = parser.compileParseTreePattern("<expr> == <TRUE>", LittleCalcParser.RULE_expr);
+        neTruePattern = parser.compileParseTreePattern("<expr> != <TRUE>", LittleCalcParser.RULE_expr);
+        eqFalsePattern = parser.compileParseTreePattern("<expr> == <FALSE>", LittleCalcParser.RULE_expr);
+        neFalsePattern = parser.compileParseTreePattern("<expr> != <FALSE>", LittleCalcParser.RULE_expr);
+        plus0PatternA = parser.compileParseTreePattern("<expr> + 0", LittleCalcParser.RULE_expr);
+        plus0PatternB = parser.compileParseTreePattern("0 + <expr>", LittleCalcParser.RULE_expr);
+        times1PatternA = parser.compileParseTreePattern("<expr> * 1", LittleCalcParser.RULE_expr);
+        times1PatternB = parser.compileParseTreePattern("1 * <expr>", LittleCalcParser.RULE_expr);
+        times0PatternA = parser.compileParseTreePattern("<expr> * 0", LittleCalcParser.RULE_expr);
+        times0PatternB = parser.compileParseTreePattern("0 * <expr>", LittleCalcParser.RULE_expr);
         resetRefactoring();
     }
 
