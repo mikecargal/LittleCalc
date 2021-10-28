@@ -348,7 +348,7 @@ public class ExecutionTest extends LCTestBase {
         interpret(LittleCalcParser::replIn, """
                     refactor { a * 1 - 5 }
                 """);
-        assertMatchedOutput(" a  - 5 ", capturedOutput);
+        assertMatchedOutput(" a /* * 1 */ - 5 ", capturedOutput);
     }
 
     @Test
